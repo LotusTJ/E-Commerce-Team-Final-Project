@@ -2494,6 +2494,9 @@ ul, ol {
 .m3-row-body p { margin: 2px 0; }
 .m3-row-actions { grid-column: 1 / -1; display: flex; gap: 8px; }
 .m3-row-actions form { margin: 0; }
+.m3-panel + .m3-panel, .m3-panel + p { margin-top: 14px; }
+.m3-row.m3-row-plain { grid-template-columns: 1fr; }
+.m3-row.m3-row-split { grid-template-columns: 1fr auto; align-items: center; }
 .m3-thumb { width: 84px; height: 84px; object-fit: cover; border-radius: 8px; background: var(--m3-line); }
 
 .m3-badge {
@@ -2569,6 +2572,7 @@ ul, ol {
     .m3-grid-sellers { grid-template-columns: repeat(2, 1fr); }
     .m3-row { grid-template-columns: 96px 1fr auto; align-items: center; }
     .m3-row-actions { grid-column: auto; flex-direction: column; }
+    .m3-row.m3-row-plain { grid-template-columns: 1fr auto; }
     .m3-thumb { width: 96px; height: 96px; }
 }
 

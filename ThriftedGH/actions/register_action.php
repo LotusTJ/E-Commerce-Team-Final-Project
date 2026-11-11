@@ -14,6 +14,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         exit();
     }
 
+    if (strlen($password) < 6) {
+        header("Location: /thriftedgh/views/buyer/register.php?error=weak_password");
+        exit();
+    }
+
     if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
         header("Location: /thriftedgh/views/buyer/register.php?error=invalid_email");
         exit();

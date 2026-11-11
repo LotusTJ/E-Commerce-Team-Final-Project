@@ -9,6 +9,8 @@ require_once __DIR__ . '/../layout/header.php';
             <?php 
                 if ($_GET['error'] === 'email_exists') echo "This email address is already registered.";
                 elseif ($_GET['error'] === 'empty_fields') echo "Please fill in all required fields.";
+                elseif ($_GET['error'] === 'weak_password') echo "Password must be at least 6 characters long.";
+                elseif ($_GET['error'] === 'invalid_email') echo "Please enter a valid email address.";
                 else echo "An error occurred. Please try again.";
             ?>
         </div>

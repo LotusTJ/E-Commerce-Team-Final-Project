@@ -41,7 +41,7 @@ require_once __DIR__ . '/components/product_card.php';
                 <a href="<?php echo $basePath; ?>index.php?page=shop" class="btn btn-lg btn-primary">
                     Shop Now <span>&rarr;</span>
                 </a>
-                <a href="<?php echo $basePath; ?>index.php?page=sellers" class="btn btn-lg btn-secondary">
+                <a href="<?php echo $basePath; ?>views/seller/apply.php" class="btn btn-lg btn-secondary">
                     Become a Seller
                 </a>
             </div>

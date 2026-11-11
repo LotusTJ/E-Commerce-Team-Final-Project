@@ -1,11 +1,11 @@
 -- THRIFTEDGH DATABASE
 -- Initial schema for the custom-coded marketplace
 
-CREATE DATABASE IF NOT EXISTS thriftedgh_db
+CREATE DATABASE IF NOT EXISTS thriftedgh
 CHARACTER SET utf8mb4
 COLLATE utf8mb4_unicode_ci;
 
-USE thriftedgh_db;
+USE thriftedgh;
 
 -- 1. USERS
 CREATE TABLE users (

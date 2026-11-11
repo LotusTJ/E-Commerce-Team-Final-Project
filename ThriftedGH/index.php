@@ -23,6 +23,16 @@ $routes = [
     'cart'     => __DIR__ . '/views/cart.php',
 ];
 
+$redirects = [
+    'login'    => 'views/buyer/login.php',
+    'register' => 'views/buyer/register.php',
+];
+
+if (isset($redirects[$page])) {
+    header('Location: ' . $redirects[$page]);
+    exit;
+}
+
 // Dispatch to matching view file
 if (array_key_exists($page, $routes) && file_exists($routes[$page])) {
     require_once $routes[$page];

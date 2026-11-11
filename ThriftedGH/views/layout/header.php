@@ -5,7 +5,14 @@
  */
 
 // Determine base path so asset references work whether loaded via index.php or directly in views/
-$basePath = (strpos($_SERVER['SCRIPT_NAME'], '/views/') !== false) ? '../' : './';
+$scriptPath = $_SERVER['SCRIPT_NAME'];
+$viewsPos = strpos($scriptPath, '/views/');
+$basePath = ($viewsPos !== false) ? str_repeat('../', substr_count(substr($scriptPath, $viewsPos + 7), '/') + 1) : './';
+
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+$navLoggedIn = !empty($_SESSION['user_id']);
 
 // Current active navigation identifier
 if (!isset($activeNav)) {
@@ -73,6 +80,19 @@ if (!isset($activeNav)) {
                            Sellers
                         </a>
                     </li>
+                    <?php if ($navLoggedIn): ?>
+                    <li class="nav-item">
+                        <a href="<?php echo $basePath; ?>views/buyer/dashboard.php"
+                           class="nav-link <?php echo ($activeNav === 'account') ? 'active' : ''; ?>">
+                           Account
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="<?php echo $basePath; ?>logout.php" class="nav-link nav-register-btn">
+                           Logout
+                        </a>
+                    </li>
+                    <?php else: ?>
                     <li class="nav-item">
                         <a href="<?php echo $basePath; ?>index.php?page=login" 
                            class="nav-link <?php echo ($activeNav === 'login') ? 'active' : ''; ?>">
@@ -85,6 +105,7 @@ if (!isset($activeNav)) {
                            Register
                         </a>
                     </li>
+                    <?php endif; ?>
                     <li class="nav-item">
                         <a href="<?php echo $basePath; ?>index.php?page=cart" 
                            class="nav-link nav-cart-link <?php echo ($activeNav === 'cart') ? 'active' : ''; ?>"

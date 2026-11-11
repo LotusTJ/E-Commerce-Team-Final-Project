@@ -5,7 +5,9 @@
  */
 
 // Determine base path for script asset reference
-$basePath = (strpos($_SERVER['SCRIPT_NAME'], '/views/') !== false) ? '../' : './';
+$scriptPath = $_SERVER['SCRIPT_NAME'];
+$viewsPos = strpos($scriptPath, '/views/');
+$basePath = ($viewsPos !== false) ? str_repeat('../', substr_count(substr($scriptPath, $viewsPos + 7), '/') + 1) : './';
 ?>
     </main>
     <!-- Main Content Area Ends -->
@@ -43,7 +45,7 @@ $basePath = (strpos($_SERVER['SCRIPT_NAME'], '/views/') !== false) ? '../' : './
                 <ul class="footer-links">
                     <li><a href="<?php echo $basePath; ?>index.php?page=login">Sign In</a></li>
                     <li><a href="<?php echo $basePath; ?>index.php?page=register">Create Buyer Account</a></li>
-                    <li><a href="<?php echo $basePath; ?>index.php?page=sellers">Become a Seller</a></li>
+                    <li><a href="<?php echo $basePath; ?>views/seller/apply.php">Become a Seller</a></li>
                 </ul>
             </div>
         </div>

@@ -97,8 +97,8 @@ require_once __DIR__ . '/../core/sample_data.php';
                     Register for a buyer account first, then submit your seller application for instant review.
                 </p>
                 <div class="join-buttons">
-                    <a href="<?php echo $basePath; ?>index.php?page=register" class="btn btn-accent">
-                        Register &amp; Apply to Sell
+                    <a href="<?php echo $basePath; ?>views/seller/apply.php" class="btn btn-accent">
+                        Apply to Sell
                     </a>
                     <a href="<?php echo $basePath; ?>index.php?page=login" class="btn btn-outline">
                         Sign In to Existing Account

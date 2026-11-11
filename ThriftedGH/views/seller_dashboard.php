@@ -30,7 +30,7 @@ tgh_render_flash();
     <div class="m3-panel">
         <h2>Your seller account is not approved yet</h2>
         <p>You can publish products once an administrator approves your seller application. Pending and rejected applications cannot publish.</p>
-        <p><a class="m3-btn" href="<?= tgh_e($root) ?>index.php?page=register">Seller application</a></p>
+        <p><a class="m3-btn" href="seller/apply.php">Seller application</a></p>
     </div>
 <?php else: ?>
     <div class="m3-stats">
