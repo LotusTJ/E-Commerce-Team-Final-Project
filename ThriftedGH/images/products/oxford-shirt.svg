@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" width="100%" height="100%">
+  <defs>
+    <linearGradient id="bgShirt" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f0f5fa" />
+      <stop offset="100%" stop-color="#dde6f0" />
+    </linearGradient>
+  </defs>
+  <rect width="400" height="400" fill="url(#bgShirt)" rx="12" />
+  <g transform="translate(45, 45)">
+    <!-- Shoulders & Body -->
+    <path d="M75,85 L115,50 L195,50 L235,85 L215,265 L95,265 Z" fill="#ffffff" stroke="#c0d2e5" stroke-width="2" />
+    <!-- Blue Vertical Stripes -->
+    <line x1="110" y1="55" x2="110" y2="265" stroke="#7ea7d4" stroke-width="2" />
+    <line x1="125" y1="55" x2="125" y2="265" stroke="#7ea7d4" stroke-width="2" />
+    <line x1="140" y1="55" x2="140" y2="265" stroke="#7ea7d4" stroke-width="2" />
+    <line x1="170" y1="55" x2="170" y2="265" stroke="#7ea7d4" stroke-width="2" />
+    <line x1="185" y1="55" x2="185" y2="265" stroke="#7ea7d4" stroke-width="2" />
+    <line x1="200" y1="55" x2="200" y2="265" stroke="#7ea7d4" stroke-width="2" />
+    <!-- Short Sleeves -->
+    <path d="M75,85 L40,140 L75,155 L95,115" fill="#ffffff" stroke="#c0d2e5" stroke-width="2" />
+    <path d="M235,85 L270,140 L235,155 L215,115" fill="#ffffff" stroke="#c0d2e5" stroke-width="2" />
+    <!-- Collar -->
+    <polygon points="115,50 155,80 135,100 105,75" fill="#eaf2f9" stroke="#7ea7d4" stroke-width="1.5" />
+    <polygon points="195,50 155,80 175,100 205,75" fill="#eaf2f9" stroke="#7ea7d4" stroke-width="1.5" />
+    <!-- Buttons -->
+    <line x1="155" y1="80" x2="155" y2="265" stroke="#b0c8e0" stroke-width="3" />
+    <circle cx="155" cy="110" r="3" fill="#688cb0" />
+    <circle cx="155" cy="145" r="3" fill="#688cb0" />
+    <circle cx="155" cy="180" r="3" fill="#688cb0" />
+    <circle cx="155" cy="215" r="3" fill="#688cb0" />
+    <!-- Chest Pocket -->
+    <rect x="175" y="120" width="30" height="32" rx="2" fill="#ffffff" stroke="#7ea7d4" stroke-width="1.5" />
+  </g>
+  <text x="200" y="365" font-family="-apple-system, sans-serif" font-size="13" font-weight="600" fill="#66829d" text-anchor="middle" letter-spacing="1.5">THRIFTEDGH • OXFORD SHIRT</text>
+</svg>
