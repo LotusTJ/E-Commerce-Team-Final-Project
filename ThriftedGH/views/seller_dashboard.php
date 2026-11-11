@@ -2,7 +2,6 @@
 
 $root = '../';
 
-require_once __DIR__ . '/../core/guards.php';
 require_once __DIR__ . '/../controllers/Product.php';
 
 tgh_require_login(tgh_login_url(''));
@@ -79,5 +78,4 @@ tgh_render_flash();
         </ul>
     <?php endif; ?>
 <?php endif; ?>
-<script src="<?= tgh_e($root) ?>js/product_form.js"></script>
 <?php tgh_layout_end(); ?>

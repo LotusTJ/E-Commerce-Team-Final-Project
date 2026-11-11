@@ -1,11 +1,68 @@
 <?php
 
-require_once __DIR__ . '/ShopQueryTrait.php';
-require_once __DIR__ . '/StorefrontClass.php';
+require_once __DIR__ . '/../core/db_class.php';
+
+trait ShopQueryTrait
+{
+    protected function conn()
+    {
+        if (!class_exists('Database')) {
+            throw new RuntimeException('Database class is not available');
+        }
+        $connection = Database::getInstance();
+        if (!$connection) {
+            throw new RuntimeException('No database connection');
+        }
+        return $connection;
+    }
+
+    protected function run($sql, $types = '', array $params = [])
+    {
+        $connection = $this->conn();
+        $stmt = $connection->prepare($sql);
+        if (!$stmt) {
+            throw new RuntimeException($connection->error);
+        }
+        if ($types !== '') {
+            $stmt->bind_param($types, ...$params);
+        }
+        if (!$stmt->execute()) {
+            $error = $stmt->error;
+            $stmt->close();
+            throw new RuntimeException($error);
+        }
+        return $stmt;
+    }
+
+    protected function fetchAll($sql, $types = '', array $params = [])
+    {
+        $stmt = $this->run($sql, $types, $params);
+        $result = $stmt->get_result();
+        $rows = $result ? $result->fetch_all(MYSQLI_ASSOC) : [];
+        $stmt->close();
+        return $rows;
+    }
+
+    protected function fetchOne($sql, $types = '', array $params = [])
+    {
+        $rows = $this->fetchAll($sql, $types, $params);
+        return $rows ? $rows[0] : null;
+    }
+
+    protected function write($sql, $types = '', array $params = [])
+    {
+        $stmt = $this->run($sql, $types, $params);
+        $outcome = ['affected' => $stmt->affected_rows, 'id' => $stmt->insert_id];
+        $stmt->close();
+        return $outcome;
+    }
+}
 
 class ProductClass
 {
     use ShopQueryTrait;
+
+    const APPROVED_CONDITION = "EXISTS (SELECT 1 FROM seller_applications sa WHERE sa.user_id = sp.user_id AND sa.status = 'approved')";
 
     const SIZES = [
         'XXS', 'XS', 'S', 'M', 'L', 'XL', 'XXL', 'XXXL', 'One Size',
@@ -67,7 +124,7 @@ class ProductClass
                     (seller_id, category_id, title, description, price, size, item_condition, image_path, stock_quantity, status)
                  SELECT sp.seller_id, ?, ?, ?, ?, ?, ?, ?, 1, 'available'
                  FROM seller_profiles sp
-                 WHERE sp.seller_id = ? AND " . StorefrontClass::APPROVED_CONDITION,
+                 WHERE sp.seller_id = ? AND " . self::APPROVED_CONDITION,
                 'issssssi',
                 [
                     (int)$data['category_id'],
@@ -261,7 +318,7 @@ class ProductClass
              FROM products p
              JOIN seller_profiles sp ON sp.seller_id = p.seller_id
              WHERE p.product_id = ? AND p.seller_id = ? AND p.status = 'available'
-               AND p.stock_quantity = 1 AND " . StorefrontClass::APPROVED_CONDITION . "
+               AND p.stock_quantity = 1 AND " . self::APPROVED_CONDITION . "
              FOR UPDATE",
             'ii',
             [(int)$productId, (int)$sellerId]
@@ -295,5 +352,39 @@ class ProductClass
                 $measurements['inseam'] ?? null
             ]
         );
+    }
+
+    public function getApprovedSellerByUserId($userId)
+    {
+        try {
+            return $this->fetchOne(
+                "SELECT sp.seller_id, sp.user_id, sp.shop_name, sp.seller_type, sp.description, sp.location
+                 FROM seller_profiles sp
+                 WHERE sp.user_id = ? AND " . self::APPROVED_CONDITION . "
+                 LIMIT 1",
+                'i',
+                [(int)$userId]
+            );
+        } catch (Throwable $error) {
+            error_log('ProductClass::getApprovedSellerByUserId ' . $error->getMessage());
+            return null;
+        }
+    }
+
+    public function getApprovedSellerById($sellerId)
+    {
+        try {
+            return $this->fetchOne(
+                "SELECT sp.seller_id, sp.shop_name, sp.seller_type, sp.description, sp.location
+                 FROM seller_profiles sp
+                 WHERE sp.seller_id = ? AND " . self::APPROVED_CONDITION . "
+                 LIMIT 1",
+                'i',
+                [(int)$sellerId]
+            );
+        } catch (Throwable $error) {
+            error_log('ProductClass::getApprovedSellerById ' . $error->getMessage());
+            return null;
+        }
     }
 }

@@ -2,7 +2,6 @@
 
 $root = '../';
 
-require_once __DIR__ . '/../core/guards.php';
 require_once __DIR__ . '/../controllers/Fit.php';
 require_once __DIR__ . '/../classes/ProductClass.php';
 
@@ -43,9 +42,9 @@ tgh_render_flash();
     <p class="m3-muted">Save your measurements and see available pieces that could suit you. These are suggestions based on garment measurements, not a guarantee of fit. Your measurements are private and only used to compare against listings.</p>
 </section>
 
-<form class="m3-form" method="post" action="<?= tgh_e($root) ?>actions/fit.php" novalidate id="fit-form">
+<form class="m3-form" method="post" action="<?= tgh_e($root) ?>actions/products.php" novalidate id="fit-form">
     <?= tgh_csrf_field() ?>
-    <input type="hidden" name="action" value="save">
+    <input type="hidden" name="action" value="fit_save">
     <div class="m3-two">
         <?php foreach ($fields as $name => $meta): ?>
             <div>
@@ -61,9 +60,9 @@ tgh_render_flash();
 </form>
 
 <?php if ($saved): ?>
-    <form method="post" action="<?= tgh_e($root) ?>actions/fit.php" class="js-confirm m3-inline-form" data-message="Delete your saved measurements?">
+    <form method="post" action="<?= tgh_e($root) ?>actions/products.php" class="js-confirm m3-inline-form" data-message="Delete your saved measurements?">
         <?= tgh_csrf_field() ?>
-        <input type="hidden" name="action" value="delete">
+        <input type="hidden" name="action" value="fit_delete">
         <button type="submit" class="m3-btn m3-btn-danger m3-btn-small">Delete my measurements</button>
     </form>
 <?php endif; ?>
@@ -116,5 +115,4 @@ tgh_render_flash();
         <?php endif; ?>
     <?php endif; ?>
 </section>
-<script src="<?= tgh_e($root) ?>js/product_form.js"></script>
 <?php tgh_layout_end(); ?>

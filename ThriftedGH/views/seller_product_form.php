@@ -2,7 +2,6 @@
 
 $root = '../';
 
-require_once __DIR__ . '/../core/guards.php';
 require_once __DIR__ . '/../controllers/Product.php';
 
 tgh_require_login(tgh_login_url(''));
@@ -163,5 +162,4 @@ tgh_render_flash();
         <a class="m3-btn m3-btn-ghost" href="seller_dashboard.php">Cancel</a>
     </div>
 </form>
-<script src="<?= tgh_e($root) ?>js/product_form.js"></script>
 <?php tgh_layout_end(); ?>

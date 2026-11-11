@@ -1,7 +1,6 @@
 <?php
 
-require_once __DIR__ . '/ShopQueryTrait.php';
-require_once __DIR__ . '/StorefrontClass.php';
+require_once __DIR__ . '/ProductClass.php';
 
 class FitClass
 {
@@ -109,7 +108,7 @@ class FitClass
                     JOIN seller_profiles sp ON sp.seller_id = p.seller_id
                     JOIN categories c ON c.category_id = p.category_id
                     WHERE p.status = 'available' AND p.stock_quantity = 1
-                      AND " . StorefrontClass::APPROVED_CONDITION . "
+                      AND " . ProductClass::APPROVED_CONDITION . "
                       AND sp.user_id <> ?";
             $types = 'i';
             $params = [(int)$userId];

@@ -2,8 +2,7 @@
 
 $root = '../';
 
-require_once __DIR__ . '/../core/guards.php';
-require_once __DIR__ . '/../controllers/Storefront.php';
+require_once __DIR__ . '/../controllers/Product.php';
 require_once __DIR__ . '/../classes/ProductClass.php';
 
 tgh_load_card_component();
