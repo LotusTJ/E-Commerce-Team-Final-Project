@@ -1,136 +1,41 @@
 <?php
-/**
- * ThriftedGH - Shop Catalog View (Task 2)
- * 
- * Features:
- * - Page heading & catalog intro
- * - Real-time keyword search bar
- * - Category, size, and condition filters
- * - Dynamic product grid with sample products
- * - Reusable product card components
- */
-
-$pageTitle = "Shop Curated Thrift Clothing | ThriftedGH";
-$activeNav = "shop";
-
-// Include shared header layout
-require_once __DIR__ . '/layout/header.php';
-
-// Load sample data
-require_once __DIR__ . '/../core/sample_data.php';
-
-// Include reusable product card component
-require_once __DIR__ . '/components/product_card.php';
+require_once __DIR__.'/../classes/CatalogueRepository.php';
+require_once __DIR__.'/components/product_card.php';
+$catalogueError=false; $products=[]; $categories=[]; $sizes=[];
+$filters=[];
+foreach (['q','category','size','condition','min_price','max_price','sort'] as $key) { $filters[$key]=substr(trim((string)($_GET[$key]??'')),0,120); }
+// Reject reversed price ranges without changing the catalogue query or database.
+$priceRangeError = $filters['min_price'] !== ''
+    && $filters['max_price'] !== ''
+    && is_numeric($filters['min_price'])
+    && is_numeric($filters['max_price'])
+    && (float)$filters['min_price'] > (float)$filters['max_price'];
+try { $repo=new CatalogueRepository(); $categories=$repo->categories(); $sizes=$repo->sizes(); if (!$priceRangeError) { $products=$repo->browse($filters); } }
+catch (Throwable $e) { error_log('Task 6 catalogue: '.$e->getMessage()); $catalogueError=true; }
+$pageTitle='Shop Second-Hand Clothing | ThriftedGH'; $activeNav='shop';
+require __DIR__.'/layout/header.php';
+function t6h($v){return htmlspecialchars((string)$v,ENT_QUOTES,'UTF-8');}
 ?>
-
-<!-- Shop Header Banner -->
-<section class="page-banner shop-banner">
-    <div class="container">
-        <div class="page-banner-content">
-            <span class="banner-badge">Ghana Thrift Collection</span>
-            <h1 class="page-title">Shop All Clothing</h1>
-            <p class="page-subtitle">
-                Authentic, one-of-a-kind second-hand pieces, vintage finds, and pre-loved street fashion.
-            </p>
-        </div>
-    </div>
-</section>
-
-<!-- Main Catalog Section -->
-<section class="section shop-section">
-    <div class="container">
-
-        <!-- Search and Filter Controls -->
-        <div class="catalog-controls">
-            <!-- Search Bar -->
-            <div class="catalog-search-wrap">
-                <div class="search-input-group">
-                    <span class="search-icon">🔍</span>
-                    <input type="text" 
-                           id="shopSearchInput" 
-                           class="form-control search-input" 
-                           placeholder="Search vintage jackets, band tees, corduroys, denim..."
-                           aria-label="Search clothing items">
-                    <button type="button" id="clearSearchBtn" class="clear-search-btn" title="Clear search" style="display:none;">&times;</button>
-                </div>
-            </div>
-
-            <!-- Filter Badges Row -->
-            <div class="filter-toolbar">
-                <!-- Category Filter -->
-                <div class="filter-group">
-                    <label for="categoryFilter" class="filter-label">Category:</label>
-                    <select id="categoryFilter" class="form-select filter-select">
-                        <option value="all">All Categories</option>
-                        <option value="Jackets & Coats">Jackets &amp; Coats</option>
-                        <option value="T-Shirts & Tops">T-Shirts &amp; Tops</option>
-                        <option value="Trousers & Jeans">Trousers &amp; Jeans</option>
-                        <option value="Dresses & Skirts">Dresses &amp; Skirts</option>
-                        <option value="Shirts">Shirts</option>
-                        <option value="Knitwear & Sweaters">Knitwear &amp; Sweaters</option>
-                    </select>
-                </div>
-
-                <!-- Size Filter -->
-                <div class="filter-group">
-                    <label for="sizeFilter" class="filter-label">Size:</label>
-                    <select id="sizeFilter" class="form-select filter-select">
-                        <option value="all">All Sizes</option>
-                        <option value="S">Small (S)</option>
-                        <option value="M">Medium (M)</option>
-                        <option value="L">Large (L)</option>
-                        <option value="XL">Extra Large (XL)</option>
-                        <option value="32">Waist 32</option>
-                        <option value="34">Waist 34</option>
-                    </select>
-                </div>
-
-                <!-- Sort Order -->
-                <div class="filter-group">
-                    <label for="sortOrder" class="filter-label">Sort:</label>
-                    <select id="sortOrder" class="form-select filter-select">
-                        <option value="default">Latest Listings</option>
-                        <option value="price-asc">Price: Low to High</option>
-                        <option value="price-desc">Price: High to Low</option>
-                    </select>
-                </div>
-
-                <!-- Reset Filters Button -->
-                <button type="button" id="resetFiltersBtn" class="btn btn-sm btn-ghost">
-                    Reset Filters
-                </button>
-            </div>
-        </div>
-
-        <!-- Results Counter & Status -->
-        <div class="catalog-status-bar">
-            <span class="results-count" id="resultsCount">Showing <strong><?php echo count($sampleProducts); ?></strong> unique items</span>
-            <span class="catalog-badge">1-of-1 Pieces • No Restocks</span>
-        </div>
-
-        <!-- Product Grid -->
-        <div class="product-grid" id="catalogProductGrid">
-            <?php
-            foreach ($sampleProducts as $product) {
-                renderProductCard($product, $basePath);
-            }
-            ?>
-        </div>
-
-        <!-- No Results Fallback Message (Hidden by default) -->
-        <div class="no-results-message" id="noResultsMsg" style="display: none;">
-            <div class="empty-state-card">
-                <span class="empty-state-icon">🧥</span>
-                <h3>No Matching Items Found</h3>
-                <p>We couldn't find any one-of-a-kind pieces matching your filter criteria.</p>
-                <button type="button" class="btn btn-primary" onclick="resetAllFilters()">View All Items</button>
-            </div>
-        </div>
-
-    </div>
-</section>
-
-<?php
-// Include shared footer layout
-require_once __DIR__ . '/layout/footer.php';
-?>
+<section class="page-banner shop-banner"><div class="container"><div class="page-banner-content"><span class="banner-badge">Ghana Thrift Collection</span><h1 class="page-title">Shop All Clothing</h1><p class="page-subtitle">One-of-a-kind pieces from approved local sellers.</p></div></div></section>
+<section class="section shop-section"><div class="container">
+<form method="get" action="<?=t6h($basePath)?>index.php" class="catalog-controls" aria-label="Search and filter clothing">
+<input type="hidden" name="page" value="shop">
+<div class="catalog-search-wrap"><label for="shopSearchInput">Search by product name</label><input class="form-control search-input" id="shopSearchInput" type="search" name="q" value="<?=t6h($filters['q'])?>" placeholder="Search clothing..."></div>
+<div class="filter-toolbar">
+<div class="filter-group"><label class="filter-label" for="categoryFilter">Category</label><select class="form-select filter-select" id="categoryFilter" name="category"><option value="">All categories</option><?php foreach($categories as $c):?><option value="<?= (int)$c['category_id']?>" <?= $filters['category']===(string)$c['category_id']?'selected':''?>><?=t6h($c['category_name'])?></option><?php endforeach;?></select></div>
+<div class="filter-group"><label class="filter-label" for="sizeFilter">Size</label><select class="form-select filter-select" id="sizeFilter" name="size"><option value="">All sizes</option><?php foreach($sizes as $s):?><option value="<?=t6h($s['value'])?>" <?=$filters['size']===$s['value']?'selected':''?>><?=t6h($s['value'])?></option><?php endforeach;?></select></div>
+<div class="filter-group"><label class="filter-label" for="conditionFilter">Condition</label><select class="form-select filter-select" id="conditionFilter" name="condition"><option value="">All conditions</option><?php foreach(['like_new'=>'Like new','good'=>'Good','fair'=>'Fair'] as $k=>$v):?><option value="<?=$k?>" <?=$filters['condition']===$k?'selected':''?>><?=$v?></option><?php endforeach;?></select></div>
+<div class="filter-group"><label class="filter-label" for="minPrice">Min price (GH₵)</label><input class="form-control" style="max-width:125px" id="minPrice" type="number" min="0" step="0.01" name="min_price" value="<?=t6h($filters['min_price'])?>"></div>
+<div class="filter-group"><label class="filter-label" for="maxPrice">Max price (GH₵)</label><input class="form-control" style="max-width:125px" id="maxPrice" type="number" min="0" step="0.01" name="max_price" value="<?=t6h($filters['max_price'])?>"></div>
+<div class="filter-group"><label class="filter-label" for="sortOrder">Sort</label><select class="form-select filter-select" name="sort" id="sortOrder"><option value="">Latest</option><option value="price-asc" <?=$filters['sort']==='price-asc'?'selected':''?>>Price: low to high</option><option value="price-desc" <?=$filters['sort']==='price-desc'?'selected':''?>>Price: high to low</option></select></div>
+<button class="btn btn-sm btn-primary" type="submit">Apply filters</button><a class="btn btn-sm btn-ghost" href="<?=t6h($basePath)?>index.php?page=shop">Reset</a>
+</div></form>
+<?php if($priceRangeError):?><div class="empty-state-card" role="alert"><h3>Invalid price range</h3><p>Minimum price cannot be greater than maximum price. Please adjust your prices and apply filters again.</p></div><?php endif;?>
+<?php if(!$priceRangeError):?>
+<div class="catalog-status-bar"><span class="results-count">Showing <strong><?=count($products)?></strong> available items<?=count($products)===100?' (first 100)':''?></span><span class="catalog-badge">One-of-one • No restocks</span></div>
+<?php if($catalogueError):?><div class="empty-state-card" role="alert"><h3>Shop temporarily unavailable</h3><p>We couldn't load the catalogue. Please check the database configuration and try again.</p></div>
+<?php elseif(!$products):?><div class="empty-state-card"><h3>No matching items found</h3><p>Try another search or clear your filters. Sold and unavailable items are not shown.</p><a class="btn btn-primary" href="<?=t6h($basePath)?>index.php?page=shop">View all items</a></div>
+<?php else:?><div class="product-grid" id="catalogProductGrid"><?php foreach($products as $item) renderProductCard($item,$basePath);?></div><?php endif;?>
+<?php endif;?>
+</div></section>
+<?php require __DIR__.'/layout/footer.php'; ?>
