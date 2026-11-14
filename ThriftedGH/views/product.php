@@ -1,199 +1,28 @@
 <?php
-/**
- * ThriftedGH - Product Details View (Task 2)
- * 
- * Features:
- * - Product image & condition badge
- * - Title, price in GH₵, size, condition
- * - Full item description
- * - Garment measurement table (matching product_measurements schema)
- * - Seller profile info card
- * - Add to Cart action button (frontend placeholder for Task 8)
- */
-
-// Load sample data
-require_once __DIR__ . '/../core/sample_data.php';
-
-// Retrieve requested product ID, defaulting to product 1
-$productId = isset($_GET['id']) ? (int)$_GET['id'] : 1;
-$product = isset($sampleProducts[$productId]) ? $sampleProducts[$productId] : $sampleProducts[1];
-
-// Associated seller info
-$seller = isset($sampleSellers[$product['seller_id']]) ? $sampleSellers[$product['seller_id']] : reset($sampleSellers);
-
-$pageTitle = htmlspecialchars($product['title']) . " | ThriftedGH";
-$activeNav = "shop";
-
-// Include shared header layout
-require_once __DIR__ . '/layout/header.php';
-require_once __DIR__ . '/components/product_card.php';
+require_once __DIR__.'/../classes/CatalogueRepository.php';
+require_once __DIR__.'/components/product_card.php';
+$id=filter_input(INPUT_GET,'id',FILTER_VALIDATE_INT);
+$product=null; $related=[]; $error=false;
+try { $repo=new CatalogueRepository(); if($id && $id>0){$product=$repo->detail($id); if($product) $related=array_filter($repo->browse([],8),fn($p)=>(int)$p['product_id']!==$id); } }
+catch(Throwable $e){error_log('Task 6 product: '.$e->getMessage());$error=true;}
+if(!$product){http_response_code($error?503:404);}
+$pageTitle=$product?htmlspecialchars($product['title'],ENT_QUOTES,'UTF-8').' | ThriftedGH':'Product unavailable | ThriftedGH';$activeNav='shop';
+require __DIR__.'/layout/header.php';
+function t6detailh($v){return htmlspecialchars((string)$v,ENT_QUOTES,'UTF-8');}
 ?>
-
-<!-- Breadcrumbs -->
-<div class="breadcrumb-bar">
-    <div class="container">
-        <nav aria-label="breadcrumb">
-            <ol class="breadcrumb-list">
-                <li><a href="<?php echo $basePath; ?>index.php?page=home">Home</a></li>
-                <li><a href="<?php echo $basePath; ?>index.php?page=shop">Shop</a></li>
-                <li class="active"><?php echo htmlspecialchars($product['title']); ?></li>
-            </ol>
-        </nav>
-    </div>
-</div>
-
-<!-- Product Details Section -->
-<section class="section product-detail-section">
-    <div class="container">
-        <div class="product-detail-grid">
-            
-            <!-- Left: Product Image Gallery -->
-            <div class="product-gallery">
-                <div class="product-main-image-wrap">
-                    <img src="<?php echo $basePath . htmlspecialchars($product['image_path']); ?>" 
-                         alt="<?php echo htmlspecialchars($product['title']); ?>" 
-                         class="product-detail-image" 
-                         id="mainProductImg">
-                    
-                    <span class="product-badge condition-<?php echo htmlspecialchars($product['item_condition']); ?> detail-badge">
-                        Condition: <?php echo htmlspecialchars($product['condition_label']); ?>
-                    </span>
-                    <span class="stock-pill">Only 1 Available (One-of-a-kind)</span>
-                </div>
-            </div>
-
-            <!-- Right: Product Information & Purchase Panel -->
-            <div class="product-summary">
-                
-                <div class="product-meta-header">
-                    <span class="product-category-tag"><?php echo htmlspecialchars($product['category_name']); ?></span>
-                    <span class="product-sku">Item #TGH-00<?php echo $product['product_id']; ?></span>
-                </div>
-
-                <h1 class="product-detail-title"><?php echo htmlspecialchars($product['title']); ?></h1>
-
-                <!-- Price Row -->
-                <div class="product-price-row">
-                    <div class="price-display">
-                        <span class="currency-symbol">GH₵</span>
-                        <span class="price-value"><?php echo number_format($product['price'], 2); ?></span>
-                    </div>
-                    <span class="delivery-hint">📦 Standard delivery to Accra &amp; campuses</span>
-                </div>
-
-                <!-- Size and Condition Badges -->
-                <div class="product-attributes-panel">
-                    <div class="attribute-pill">
-                        <span class="attr-label">Size</span>
-                        <span class="attr-value size-val"><?php echo htmlspecialchars($product['size']); ?></span>
-                    </div>
-                    <div class="attribute-pill">
-                        <span class="attr-label">Condition</span>
-                        <span class="attr-value condition-val"><?php echo htmlspecialchars($product['condition_label']); ?></span>
-                    </div>
-                    <div class="attribute-pill">
-                        <span class="attr-label">Availability</span>
-                        <span class="attr-value in-stock-val">In Stock (1 piece)</span>
-                    </div>
-                </div>
-
-                <!-- Product Description -->
-                <div class="product-desc-box">
-                    <h3 class="desc-heading">Item Description</h3>
-                    <p class="desc-text"><?php echo nl2br(htmlspecialchars($product['description'])); ?></p>
-                </div>
-
-                <!-- Garment Measurements (Table Schema Preview) -->
-                <div class="measurements-box">
-                    <div class="measurements-header">
-                        <h3 class="desc-heading">Exact Garment Measurements</h3>
-                        <span class="measurements-note">Measured flat in centimeters (cm)</span>
-                    </div>
-                    <div class="measurements-grid">
-                        <?php if (!empty($product['measurements']['chest_cm'])): ?>
-                            <div class="meas-item">
-                                <span class="meas-name">Chest Width</span>
-                                <span class="meas-value"><?php echo $product['measurements']['chest_cm']; ?> cm</span>
-                            </div>
-                        <?php endif; ?>
-                        <?php if (!empty($product['measurements']['waist_cm'])): ?>
-                            <div class="meas-item">
-                                <span class="meas-name">Waist</span>
-                                <span class="meas-value"><?php echo $product['measurements']['waist_cm']; ?> cm</span>
-                            </div>
-                        <?php endif; ?>
-                        <?php if (!empty($product['measurements']['hips_cm'])): ?>
-                            <div class="meas-item">
-                                <span class="meas-name">Hips</span>
-                                <span class="meas-value"><?php echo $product['measurements']['hips_cm']; ?> cm</span>
-                            </div>
-                        <?php endif; ?>
-                        <?php if (!empty($product['measurements']['inseam_cm'])): ?>
-                            <div class="meas-item">
-                                <span class="meas-name">Inseam Length</span>
-                                <span class="meas-value"><?php echo $product['measurements']['inseam_cm']; ?> cm</span>
-                            </div>
-                        <?php endif; ?>
-                    </div>
-                    <p class="fit-info-text">
-                        💡 <em>Tip: Compare these flat measurements to your best-fitting clothes at home for the ideal fit.</em>
-                    </p>
-                </div>
-
-                <!-- Purchase Buttons -->
-                <div class="product-purchase-box">
-                    <button type="button" 
-                            class="btn btn-lg btn-primary btn-block placeholder-action-btn"
-                            data-action-name="Add to Cart" 
-                            data-task-info="Task 8 Multi-Seller Shopping Cart">
-                            🛒 Add to Cart (Placeholder)
-                    </button>
-                    
-                    <a href="<?php echo $basePath; ?>index.php?page=cart" class="btn btn-lg btn-outline btn-block">
-                        View Shopping Cart
-                    </a>
-                </div>
-
-                <!-- Seller Profile Card -->
-                <div class="seller-profile-card">
-                    <div class="seller-card-avatar">🏷️</div>
-                    <div class="seller-card-info">
-                        <div class="seller-type-tag"><?php echo ($seller['seller_type'] === 'business') ? 'Approved Thrift Business' : 'Approved Individual Seller'; ?></div>
-                        <h4 class="seller-card-name"><?php echo htmlspecialchars($seller['shop_name']); ?></h4>
-                        <p class="seller-card-location">📍 <?php echo htmlspecialchars($seller['location']); ?></p>
-                        <p class="seller-card-desc"><?php echo htmlspecialchars($seller['description']); ?></p>
-                        <div class="seller-card-links">
-                            <a href="<?php echo $basePath; ?>index.php?page=sellers" class="seller-store-link">
-                                View Seller's Full Storefront &rarr;
-                            </a>
-                        </div>
-                    </div>
-                </div>
-
-            </div>
-        </div>
-
-        <!-- More Recommended Thrift Drops -->
-        <div class="related-products-section">
-            <h2 class="section-title">You Might Also Like</h2>
-            <div class="product-grid">
-                <?php
-                // Show up to 3 other products
-                $relatedCount = 0;
-                foreach ($sampleProducts as $relItem) {
-                    if ($relItem['product_id'] != $product['product_id'] && $relatedCount < 3) {
-                        renderProductCard($relItem, $basePath);
-                        $relatedCount++;
-                    }
-                }
-                ?>
-            </div>
-        </div>
-
-    </div>
-</section>
-
-<?php
-// Include shared footer layout
-require_once __DIR__ . '/layout/footer.php';
-?>
+<section class="section product-detail-section"><div class="container">
+<?php if(!$product):?><div class="empty-state-card"><h1><?=$error?'Unable to load product':'This item is no longer available'?></h1><p><?=$error?'Please try again later.':'It may have been sold, reserved, hidden or removed.'?></p><a class="btn btn-primary" href="<?=t6detailh($basePath)?>index.php?page=shop">Browse available clothing</a></div>
+<?php else:?>
+<nav aria-label="Breadcrumb"><a href="<?=t6detailh($basePath)?>index.php?page=shop">Shop</a> / <?=t6detailh($product['title'])?></nav>
+<div class="product-detail-grid"><div class="product-gallery"><div class="product-main-image-wrap"><img class="product-detail-image" src="<?=t6detailh($basePath.tgh_catalogue_image($product['image_path']))?>" alt="<?=t6detailh($product['title'])?>"><span class="stock-pill">Only 1 available</span></div></div>
+<div class="product-summary"><span class="product-category-tag"><?=t6detailh($product['category_name'])?></span><h1 class="product-detail-title"><?=t6detailh($product['title'])?></h1>
+<div class="product-price-row"><div class="price-display"><span class="currency-symbol">GH₵</span><span class="price-value"><?=number_format((float)$product['price'],2)?></span></div></div>
+<div class="product-attributes-panel"><div class="attribute-pill"><span class="attr-label">Size</span><span class="attr-value"><?=t6detailh($product['size']?:'Not specified')?></span></div><div class="attribute-pill"><span class="attr-label">Condition</span><span class="attr-value"><?=t6detailh(ucwords(str_replace('_',' ',$product['item_condition'])))?></span></div><div class="attribute-pill"><span class="attr-label">Availability</span><span class="attr-value">In stock (1)</span></div></div>
+<div class="product-desc-box"><h3 class="desc-heading">Item description</h3><p class="desc-text"><?=nl2br(t6detailh($product['description']?:'No description provided.'))?></p></div>
+<div class="measurements-box"><h3 class="desc-heading">Garment measurements</h3><div class="measurements-grid"><?php $hasMeasurements=false;foreach(['chest_cm'=>'Chest','waist_cm'=>'Waist','hips_cm'=>'Hips','inseam_cm'=>'Inseam'] as $key=>$label):if($product[$key]!==null){$hasMeasurements=true;?><div class="meas-item"><span class="meas-name"><?=$label?></span><span class="meas-value"><?=t6detailh($product[$key])?> cm</span></div><?php }endforeach;if(!$hasMeasurements):?><p>Measurements have not been provided.</p><?php endif;?></div></div>
+<div class="seller-profile-card"><div class="seller-card-avatar">🏷️</div><div class="seller-card-info"><div class="seller-type-tag"><?=t6detailh(ucfirst($product['seller_type']))?> seller</div><h4 class="seller-card-name"><?=t6detailh($product['seller_name'])?></h4><p class="seller-card-location"><?=t6detailh($product['location']?:'Location not provided')?></p><p><?=t6detailh($product['seller_description']?:'')?></p><a class="seller-store-link" href="<?=t6detailh($basePath)?>views/storefront.php?seller_id=<?=(int)$product['seller_id']?>">View seller storefront →</a></div></div>
+<a class="btn btn-outline" href="<?=t6detailh($basePath)?>index.php?page=shop">Continue shopping</a>
+</div></div>
+<?php if($related):?><div class="related-products-section"><h2 class="section-title">You might also like</h2><div class="product-grid"><?php foreach(array_slice($related,0,3) as $item)renderProductCard($item,$basePath);?></div></div><?php endif;?>
+<?php endif;?></div></section>
+<?php require __DIR__.'/layout/footer.php';?>

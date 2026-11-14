@@ -16,7 +16,9 @@ $activeNav = "home";
 require_once __DIR__ . '/layout/header.php';
 
 // Load sample data
-require_once __DIR__ . '/../core/sample_data.php';
+require_once __DIR__ . '/../classes/CatalogueRepository.php';
+$sampleProducts = [];
+try { $sampleProducts = (new CatalogueRepository())->browse([], 6); } catch (Throwable $e) { error_log('Home catalogue: '.$e->getMessage()); }
 
 // Include reusable product card component
 require_once __DIR__ . '/components/product_card.php';
@@ -66,12 +68,12 @@ require_once __DIR__ . '/components/product_card.php';
         <div class="hero-image-wrap">
             <div class="hero-card-stack">
                 <div class="hero-preview-card">
-                    <div class="preview-tag">Featured Drop</div>
+                    <div class="preview-tag">One-of-a-kind style</div>
                     <img src="<?php echo $basePath; ?>images/products/denim-jacket.svg" alt="Vintage Denim Jacket" class="hero-img">
                     <div class="preview-details">
-                        <h4>90s Vintage Denim Jacket</h4>
+                        <h4>Discover unique thrift pieces</h4>
                         <div class="preview-price-row">
-                            <span class="preview-price">GH₵ 220.00</span>
+                            <span class="preview-price">Shop available listings</span>
                             <span class="badge condition-like-new">Like New</span>
                         </div>
                     </div>
@@ -152,8 +154,9 @@ require_once __DIR__ . '/components/product_card.php';
 
         <div class="product-grid">
             <?php
-            // Filter sample products to show featured ones (first 4 items)
+            // Display up to four actual available database listings
             $featuredList = array_slice($sampleProducts, 0, 4, true);
+            if (!$featuredList) { echo '<p>New thrift drops are coming soon. Check the shop for updates.</p>'; }
             foreach ($featuredList as $item) {
                 renderProductCard($item, $basePath);
             }
