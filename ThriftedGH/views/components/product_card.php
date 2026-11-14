@@ -15,8 +15,10 @@
  * or by calling renderProductCard($product, $basePath).
  */
 
+if (!function_exists('tgh_catalogue_image')) { require_once __DIR__ . '/../../classes/CatalogueRepository.php'; }
 if (!function_exists('renderProductCard')) {
     function renderProductCard($product, $basePath = './') {
+        $product['image_path'] = tgh_catalogue_image($product['image_path'] ?? '');
         $conditionClass = 'condition-' . strtolower(str_replace('_', '-', $product['item_condition']));
         $conditionName = isset($product['condition_label']) ? $product['condition_label'] : ucwords(str_replace('_', ' ', $product['item_condition']));
         $productUrl = $basePath . 'index.php?page=product&id=' . (int)$product['product_id'];
