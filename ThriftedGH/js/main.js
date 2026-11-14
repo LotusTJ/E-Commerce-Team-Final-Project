@@ -10,7 +10,7 @@
 
 document.addEventListener('DOMContentLoaded', function () {
     initMobileNav();
-    initShopFilters();
+    // Task 6 filters are handled by the PHP catalogue form; preserve GET selections.
     initPlaceholderButtons();
 });
 
