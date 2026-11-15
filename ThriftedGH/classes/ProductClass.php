@@ -274,6 +274,23 @@ class ProductClass
         }
     }
 
+    public function getApprovedSellers()
+    {
+        try {
+            return $this->fetchAll(
+                "SELECT sp.seller_id, sp.shop_name, sp.seller_type, sp.location, sp.description, sp.created_at,
+                        (SELECT COUNT(*) FROM products p
+                         WHERE p.seller_id = sp.seller_id AND p.status = 'available' AND p.stock_quantity = 1) AS item_count
+                 FROM seller_profiles sp
+                 WHERE " . self::APPROVED_CONDITION . "
+                 ORDER BY sp.shop_name ASC"
+            );
+        } catch (Throwable $error) {
+            error_log('ProductClass::getApprovedSellers ' . $error->getMessage());
+            return null;
+        }
+    }
+
     public function getAvailableBySeller($sellerId, $limit, $offset)
     {
         try {

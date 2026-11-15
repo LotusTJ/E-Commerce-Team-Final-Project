@@ -27,6 +27,7 @@ $seller = $storefront['seller'];
 
 tgh_layout_start($seller['shop_name'], $root, 'sellers');
 ?>
+<p class="m3-muted"><a href="sellers.php">&larr; All sellers</a></p>
 <section class="m3-head">
     <h1><?= tgh_e($seller['shop_name']) ?></h1>
     <p>

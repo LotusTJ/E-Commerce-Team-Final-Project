@@ -5,7 +5,7 @@
  * Features:
  * - Approved seller directory
  * - Seller cards with shop name, location, seller type badge, bio
- * - Links to storefront placeholders (Task 7)
+ * - Links to each seller's public storefront (Task 7)
  * - Information section on how to apply as a seller
  */
 
@@ -15,8 +15,9 @@ $activeNav = "sellers";
 // Include shared header layout
 require_once __DIR__ . '/layout/header.php';
 
-// Load sample data
-require_once __DIR__ . '/../core/sample_data.php';
+require_once __DIR__ . '/../controllers/Product.php';
+
+$sellers = storefront_directory_ctr();
 ?>
 
 <!-- Sellers Banner -->
@@ -44,8 +45,19 @@ require_once __DIR__ . '/../core/sample_data.php';
         </div>
 
         <!-- Sellers Grid -->
+        <?php if ($sellers === null): ?>
+            <div class="empty-state-card">
+                <h2>Sellers are unavailable right now</h2>
+                <p>We could not load the seller directory. Please try again shortly.</p>
+            </div>
+        <?php elseif (!$sellers): ?>
+            <div class="empty-state-card">
+                <h2>No approved sellers yet</h2>
+                <p>Approved sellers will appear here as soon as they are verified.</p>
+            </div>
+        <?php else: ?>
         <div class="sellers-grid">
-            <?php foreach ($sampleSellers as $s): ?>
+            <?php foreach ($sellers as $s): ?>
                 <article class="seller-card">
                     <div class="seller-card-top">
                         <div class="seller-avatar-large">
@@ -56,36 +68,35 @@ require_once __DIR__ . '/../core/sample_data.php';
                                 <?php echo ($s['seller_type'] === 'business') ? 'Thrift Business' : 'Individual / Student'; ?>
                             </span>
                             <h3 class="seller-shop-title"><?php echo htmlspecialchars($s['shop_name']); ?></h3>
-                            <div class="seller-location-text">📍 <?php echo htmlspecialchars($s['location']); ?></div>
+                            <div class="seller-location-text">📍 <?php echo htmlspecialchars($s['location'] ?: 'Location not provided'); ?></div>
                         </div>
                     </div>
 
                     <p class="seller-bio-text">
-                        <?php echo htmlspecialchars($s['description']); ?>
+                        <?php echo htmlspecialchars($s['description'] ?: 'This seller has not added a description yet.'); ?>
                     </p>
 
                     <div class="seller-stats-bar">
                         <div class="stat-item">
-                            <span class="stat-number">★ <?php echo $s['rating']; ?></span>
-                            <span class="stat-name">Seller Rating</span>
+                            <span class="stat-number"><?php echo (int)$s['item_count']; ?></span>
+                            <span class="stat-name">Available Items</span>
                         </div>
                         <div class="stat-item">
-                            <span class="stat-number"><?php echo $s['items_count']; ?></span>
-                            <span class="stat-name">Active Drops</span>
+                            <span class="stat-number"><?php echo htmlspecialchars(date('M Y', strtotime($s['created_at']))); ?></span>
+                            <span class="stat-name">Member Since</span>
                         </div>
                     </div>
 
                     <div class="seller-card-action">
-                        <button type="button" 
-                                class="btn btn-primary btn-block placeholder-action-btn"
-                                data-action-name="View Storefront" 
-                                data-task-info="Task 7 Public Seller Storefronts">
-                            Visit Storefront (Placeholder) &rarr;
-                        </button>
+                        <a href="<?php echo $basePath; ?>views/storefront.php?seller_id=<?php echo (int)$s['seller_id']; ?>"
+                           class="btn btn-primary btn-block">
+                            Visit Storefront &rarr;
+                        </a>
                     </div>
                 </article>
             <?php endforeach; ?>
         </div>
+        <?php endif; ?>
 
         <!-- How To Become A Seller Card -->
         <div class="seller-join-box">

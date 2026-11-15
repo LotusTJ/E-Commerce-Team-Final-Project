@@ -457,6 +457,11 @@ function seller_remove_product_ctr($userId, $productId)
 
 const STOREFRONT_PAGE_SIZE = 24;
 
+function storefront_directory_ctr()
+{
+    return (new ProductClass())->getApprovedSellers();
+}
+
 function storefront_page_ctr($sellerId, $page)
 {
     if (!is_scalar($sellerId) || !preg_match('/^\d{1,10}$/', (string)$sellerId) || (int)$sellerId < 1) {
