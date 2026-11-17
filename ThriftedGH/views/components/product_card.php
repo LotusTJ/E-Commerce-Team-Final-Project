@@ -15,6 +15,7 @@
  * or by calling renderProductCard($product, $basePath).
  */
 
+require_once __DIR__ . '/../../controllers/Cart.php';
 if (!function_exists('tgh_catalogue_image')) { require_once __DIR__ . '/../../classes/CatalogueRepository.php'; }
 if (!function_exists('renderProductCard')) {
     function renderProductCard($product, $basePath = './') {
@@ -40,7 +41,7 @@ if (!function_exists('renderProductCard')) {
 
                 <!-- Clothing Size Tag -->
                 <span class="product-size-badge" title="Clothing Size">
-                    Size: <?php echo htmlspecialchars($product['size']); ?>
+                    Size: <?php echo htmlspecialchars($product['size'] ?? 'Not specified'); ?>
                 </span>
             </div>
 
@@ -74,13 +75,12 @@ if (!function_exists('renderProductCard')) {
                         <a href="<?php echo $productUrl; ?>" class="btn btn-sm btn-outline" title="View garment details and measurements">
                             Details
                         </a>
-                        <button type="button" 
-                                class="btn btn-sm btn-primary placeholder-action-btn" 
-                                data-action-name="Add to Cart" 
-                                data-task-info="Task 8 Multi-Seller Shopping Cart"
-                                title="Add to Cart (Placeholder)">
-                            + Cart
-                        </button>
+                        <form method="post" action="<?php echo htmlspecialchars($basePath); ?>actions/cart.php">
+                            <?php echo tgh_csrf_field(); ?>
+                            <input type="hidden" name="product_id" value="<?php echo (int)$product['product_id']; ?>">
+                            <?php if (!empty($_SESSION['user_id'])): ?><button class="btn btn-sm btn-primary" name="action" value="add">+ Cart</button>
+                            <?php else: ?><a class="btn btn-sm btn-primary" href="<?php echo htmlspecialchars($basePath); ?>index.php?page=login">Log in to buy</a><?php endif; ?>
+                        </form>
                     </div>
                 </div>
             </div>

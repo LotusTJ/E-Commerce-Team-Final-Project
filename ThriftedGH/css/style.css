@@ -2584,3 +2584,11 @@ ul, ol {
 .m3-fit-item { display: flex; flex-direction: column; gap: 8px; }
 .m3-fit-info { padding: 0 4px; }
 .m3-fit-info .m3-fit-notes { margin: 6px 0 0; }
+
+/* Member 4: order and checkout layouts */
+.m4-order-nav { margin: 1rem 0 2rem; }
+.m4-order-item { padding: 1.25rem; margin: 1rem 0; border: 1px solid #ddd; border-radius: 12px; overflow-wrap: anywhere; }
+.m4-table-wrap { overflow-x: auto; }
+.m4-table-wrap table { width: 100%; border-collapse: collapse; }
+.m4-table-wrap th,.m4-table-wrap td { text-align: left; padding: .75rem; border-bottom: 1px solid #ddd; }
+textarea.form-control { display: block; width: 100%; max-width: 40rem; margin: .75rem 0 1.5rem; padding: 1rem; }

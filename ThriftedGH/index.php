@@ -21,6 +21,9 @@ $routes = [
     'login'    => __DIR__ . '/views/login.php',
     'register' => __DIR__ . '/views/register.php',
     'cart'     => __DIR__ . '/views/cart.php',
+    'checkout' => __DIR__ . '/views/checkout.php',
+    'orders'   => __DIR__ . '/views/orders.php',
+    'payment_result' => __DIR__ . '/views/payment_result.php',
 ];
 
 $redirects = [

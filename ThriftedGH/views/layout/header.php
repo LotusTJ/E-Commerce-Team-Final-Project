@@ -87,6 +87,7 @@ if (!isset($activeNav)) {
                            Account
                         </a>
                     </li>
+                    <li class="nav-item"><a class="nav-link" href="<?php echo $basePath; ?>index.php?page=orders">Orders</a></li>
                     <li class="nav-item">
                         <a href="<?php echo $basePath; ?>logout.php" class="nav-link nav-register-btn">
                            Logout
@@ -111,7 +112,6 @@ if (!isset($activeNav)) {
                            class="nav-link nav-cart-link <?php echo ($activeNav === 'cart') ? 'active' : ''; ?>"
                            aria-label="Shopping Cart">
                            <span class="cart-icon">🛒</span> Cart
-                           <span class="cart-counter">2</span>
                         </a>
                     </li>
                 </ul>

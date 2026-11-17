@@ -1,0 +1,10 @@
+# Local configuration and test artifacts
+.env
+.env.*
+!.env.example
+core/*.local.php
+*.log
+.DS_Store
+/tests/.runtime/
+
+/core/db_cred.php
