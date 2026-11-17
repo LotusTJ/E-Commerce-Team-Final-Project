@@ -7,10 +7,12 @@ Implemented on `member4/cart-payments-orders`, based on main commit `2095c1e`.
 | Task | Implemented behaviour | Verification |
 |---|---|---|
 | 8 — Multi-seller cart | Buyer-linked database cart, add/remove, product images and seller names, quantity one, duplicate protection, database prices and checkout revalidation | Database and HTTP checks passed |
-| 9 — Orders and Paystack | Server-calculated GHS totals, 15-minute atomic reservations, test checkout, server verification, authenticated webhooks, replay-safe paid orders, sold inventory and 10% commission | Database/provider-contract checks passed; actual Paystack sandbox transaction and hosted webhook delivery still pending |
+| 9 — Orders and Paystack | Server-calculated GHS totals, 15-minute atomic reservations, test checkout, server verification, authenticated webhooks, replay-safe paid orders, sold inventory and 10% commission | Real Paystack TEST success and decline verified locally; callback, earnings and expiry verified; actual public webhook delivery deferred by user choice |
 | 10 — Order management | Buyer history/details, seller-only paid order items and sequential fulfilment updates, admin order/review/commission overview, separate paid and delivered sales | Access-control and HTTP checks passed |
 
-This implementation has not been pushed or merged. Existing Task 5 files outside this clone and existing XAMPP databases were not modified.
+This implementation has not been pushed or merged. Existing Task 5 files outside this clone and unrelated XAMPP databases were not modified. At the user’s request, the newly created thriftedgh database now contains demo accounts, products and sandbox test orders.
+
+See `PAYSTACK_TEST_EVIDENCE.md` for the real sandbox results, exact local callback URL and deferred public delivery check.
 
 ## Set up the application
 
@@ -35,6 +37,10 @@ The database configuration loader supports existing private credentials; removin
 
 Provider documentation: [Accept payments](https://paystack.com/docs/payments/accept-payments/), [Verify payments](https://paystack.com/docs/payments/verify-payments/), [Webhooks](https://paystack.com/docs/payments/webhooks/).
 
+## Local development worker
+
+Run `php scripts/payment_worker.php` while developing to reconcile test payments and release expired reservations every minute. Stop it with Ctrl-C. `php scripts/payment_worker.php --once` performs one cycle. This is a foreground local worker, not a system startup service. On hosting, use the server scheduler described below instead.
+
 ## Reservation maintenance
 
 Configure a server scheduler to run `scripts/reconcile_payments.php` every minute, using the same PHP configuration, database and private payment settings as the website. This verifies pending payments and releases expired reservations. The script is CLI-only.
@@ -42,7 +48,7 @@ Configure a server scheduler to run `scripts/reconcile_payments.php` every minut
 On a Mac, the PHP executable is commonly `/Applications/XAMPP/xamppfiles/bin/php`. Pass the script's absolute path to it. For inventory cleanup without contacting Paystack, the CLI-only `scripts/expire_reservations.php` is also available. Checkout performs expired-reservation cleanup before creating a new order, but that is not a substitute for a regular worker on a deployed application.
 
 - Known failed/abandoned payments release their own reservations.
-- Network/initialization errors keep reservations until verification or expiry because Paystack may have received the request despite a lost response. The buyer can check payment status from the order page.
+- Definite provider validation/authentication rejections release reservations immediately. Network/initialization errors keep reservations until verification or expiry because Paystack may have received the request despite a lost response. The buyer can check payment status from the order page.
 - Only the order holding a product reservation can sell it. If a successful charge arrives AFTER its reservation was released, the payment is recorded as received, the order is flagged for admin review, and no stock or seller earnings are taken from another order. The administrator must investigate and refund via Paystack if appropriate. Automatic refunds are not implemented.
 - A buyer can have one active pending checkout. If checkout was interrupted before redirect, check payment status or wait for expiry before starting again; checkout-link resumption is not implemented.
 
@@ -85,4 +91,4 @@ Fresh installation and an additive upgrade of the original main schema were both
 7. Test a failed payment and an abandoned/expired reservation with the worker enabled. Verify stock returns without earnings. Test a late notification and confirm it enters review without double-selling.
 8. Re-test seller upload/edit/remove, authentication and mobile views on the actual XAMPP/deployment environment. Save screenshots and provider references as submission evidence without secret keys or customer information.
 
-Do not mark Task 9 fully accepted until this real sandbox exercise and scheduled maintenance are confirmed.
+The real sandbox success/decline exercise and local maintenance have now passed. Public webhook delivery remains deferred by the user; do not mark the hosted webhook acceptance criterion complete until it is tested on public HTTPS.

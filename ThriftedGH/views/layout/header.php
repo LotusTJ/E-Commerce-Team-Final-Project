@@ -9,9 +9,7 @@ $scriptPath = $_SERVER['SCRIPT_NAME'];
 $viewsPos = strpos($scriptPath, '/views/');
 $basePath = ($viewsPos !== false) ? str_repeat('../', substr_count(substr($scriptPath, $viewsPos + 7), '/') + 1) : './';
 
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
+require_once __DIR__.'/../../core/session.php';
 $navLoggedIn = !empty($_SESSION['user_id']);
 
 // Current active navigation identifier

@@ -1,4 +1,11 @@
 <?php
+class PaystackRequestException extends RuntimeException {
+    public $definitelyRejected;
+    public function __construct($message, $definitelyRejected=false) {
+        parent::__construct($message);
+        $this->definitelyRejected=$definitelyRejected;
+    }
+}
 class PaystackService {
     private $key;
     public static function config($name) {
@@ -21,9 +28,20 @@ class PaystackService {
             CURLOPT_HTTPHEADER=>['Authorization: Bearer '.$this->key,'Content-Type: application/json']]);
         if ($payload!==null) curl_setopt_array($ch,[CURLOPT_POST=>true,CURLOPT_POSTFIELDS=>json_encode($payload,JSON_THROW_ON_ERROR)]);
         $raw=curl_exec($ch); $status=curl_getinfo($ch,CURLINFO_HTTP_CODE); curl_close($ch);
-        if ($raw===false || $status<200 || $status>=300) throw new RuntimeException('Payment provider unavailable. Check your order before trying again.');
-        $result=json_decode($raw,true,512,JSON_THROW_ON_ERROR);
-        if (($result['status']??false)!==true || !is_array($result['data']??null)) throw new RuntimeException('Payment provider could not process this request.');
+        if ($raw===false) throw new PaystackRequestException('Payment provider could not be reached. Check this order before starting another checkout.');
+        try { $result=json_decode($raw,true,512,JSON_THROW_ON_ERROR); }
+        catch (JsonException $e) { throw new PaystackRequestException('Payment provider returned an unreadable response. Check this order before trying again.'); }
+        if ($status<200 || $status>=300 || ($result['status']??false)!==true || !is_array($result['data']??null)) {
+            $message=is_string($result['message']??null)?$result['message']:'';
+            $known=[
+                'Invalid Email Address Passed'=>'Paystack rejected your email address. Please use a valid email address for checkout.',
+                'Currency not supported by merchant'=>'This Paystack test account does not support GHS. Use a Ghana-enabled test account.',
+                'Invalid key'=>'Paystack rejected the configured test key. Check the private payment configuration.',
+            ];
+            $rejected=$status>=400 && $status<500 && isset($known[$message]);
+            error_log('Paystack request rejected: HTTP '.$status);
+            throw new PaystackRequestException($known[$message]??'Payment provider could not process this request. Check the order status before trying again.', $rejected);
+        }
         return $result['data'];
     }
     public function callbackUrl() {
