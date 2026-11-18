@@ -1,5 +1,5 @@
 <?php
-require_once 'db_cred.php';
+require_once __DIR__ . '/db_config.php';
 
 class Database {
     private static $instance = null;
@@ -7,13 +7,13 @@ class Database {
 
     private function __construct() {
         try {
-            $this->conn = new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME);
+            $this->conn = new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME, DB_PORT, DB_SOCKET);
             if ($this->conn->connect_error) {
                 throw new Exception("Database Connection Failed: " . $this->conn->connect_error);
             }
             $this->conn->set_charset("utf8mb4");
         } catch (Exception $e) {
-            die("Connection error: " . $e->getMessage());
+            throw new RuntimeException("Database connection unavailable", 0, $e);
         }
     }
 

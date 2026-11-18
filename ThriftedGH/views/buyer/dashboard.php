@@ -22,6 +22,7 @@ tgh_render_flash();
 
 <div class="m3-panel">
     <h2>Shopping</h2>
+    <p><a class="m3-btn" href="../../index.php?page=orders">My orders</a> · <a href="../../index.php?page=orders&scope=seller">Seller orders</a></p>
     <div class="m3-actions-row">
         <a class="m3-btn" href="<?= tgh_e($root) ?>index.php?page=shop">Browse the shop</a>
         <a class="m3-btn m3-btn-ghost" href="../find_my_fit.php">Find my fit</a>

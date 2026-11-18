@@ -9,9 +9,7 @@ $scriptPath = $_SERVER['SCRIPT_NAME'];
 $viewsPos = strpos($scriptPath, '/views/');
 $basePath = ($viewsPos !== false) ? str_repeat('../', substr_count(substr($scriptPath, $viewsPos + 7), '/') + 1) : './';
 
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
+require_once __DIR__.'/../../core/session.php';
 $navLoggedIn = !empty($_SESSION['user_id']);
 
 // Current active navigation identifier
@@ -87,6 +85,7 @@ if (!isset($activeNav)) {
                            Account
                         </a>
                     </li>
+                    <li class="nav-item"><a class="nav-link" href="<?php echo $basePath; ?>index.php?page=orders">Orders</a></li>
                     <li class="nav-item">
                         <a href="<?php echo $basePath; ?>logout.php" class="nav-link nav-register-btn">
                            Logout
@@ -111,7 +110,6 @@ if (!isset($activeNav)) {
                            class="nav-link nav-cart-link <?php echo ($activeNav === 'cart') ? 'active' : ''; ?>"
                            aria-label="Shopping Cart">
                            <span class="cart-icon">🛒</span> Cart
-                           <span class="cart-counter">2</span>
                         </a>
                     </li>
                 </ul>
