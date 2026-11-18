@@ -2,7 +2,8 @@
 require_once __DIR__ . '/../layout/header.php';
 ?>
 <div style="max-width: 400px; margin: 3rem auto; background: white; padding: 2rem; border-radius: 0.5rem; border: 1px solid #e5e7eb;">
-    <h2 style="margin-bottom: 1.5rem; text-align: center;">Buyer Login</h2>
+    <h2 style="margin-bottom: 0.5rem; text-align: center;">Log in</h2>
+    <p style="margin: 0 0 1.5rem; text-align: center; color: var(--color-text-muted); font-size: 0.9rem;">Buyers and sellers sign in here.</p>
 
     <?php if (isset($_GET['success']) && $_GET['success'] === 'registered'): ?>
         <div style="background: #d1fae5; color: #065f46; padding: 0.75rem; border-radius: 0.375rem; margin-bottom: 1rem; font-size: 0.875rem;">
