@@ -6,17 +6,17 @@ try {
     $service=new PaystackService(); $service->callbackUrl();
     $model=new OrderClass(); $model->expire();
     $order=$model->create($user['user_id'],$_POST['delivery_address']??null);
-    // An ambiguous network failure must not release inventory: Paystack may have accepted initialization.
     $url=$service->initialize($order);
     header('Location: '.$url, true, 303); exit;
 } catch (Throwable $e) {
-    if ($e instanceof PaystackRequestException && $e->definitelyRejected && isset($order)) {
-        try { $model->fail($order['order_reference']); }
+    $released=false;
+    if (isset($order)) {
+        try { $model->fail($order['order_reference']); $released=true; }
         catch (Throwable $releaseError) { error_log('Checkout reservation release failed: '.$releaseError->getMessage()); }
     }
     if ($e instanceof PaystackRequestException) {
         error_log('Checkout: '.$e->getMessage());
-        tgh_flash_set('error',$e->getMessage());
+        tgh_flash_set('error',$released && !$e->definitelyRejected ? 'We could not reach the payment provider. Your items were released, so please try again.' : $e->getMessage());
     } else commerce_error($e);
 }
 tgh_redirect('../index.php?page=orders');

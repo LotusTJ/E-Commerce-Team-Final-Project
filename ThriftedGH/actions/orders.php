@@ -9,6 +9,15 @@ try {
         if (!$o || (int)$o['buyer_id']!==(int)$user['user_id']) throw new DomainException('Order unavailable.');
         commerce_verify($ref);
         tgh_flash_set('success','Payment status checked.');
+    } elseif (($_POST['action']??'')==='cancel') {
+        $ref=$_POST['reference']??null;
+        if (!is_string($ref)) throw new DomainException('Invalid reference.');
+        $model=new OrderClass(); $o=$model->byReference($ref);
+        if (!$o || (int)$o['buyer_id']!==(int)$user['user_id']) throw new DomainException('Order unavailable.');
+        try { commerce_verify($ref); } catch (PaystackRequestException $e) { error_log('Cancel verify: '.$e->getMessage()); }
+        $model->fail($ref);
+        $o=$model->byReference($ref);
+        tgh_flash_set('success',$o['payment_status']==='paid' ? 'Your payment had already gone through, so this order was kept.' : 'Checkout cancelled. Your items are available again.');
     } elseif (($_POST['action']??'')==='fulfil') {
         $next=$_POST['status']??null;
         if (!is_string($next)) throw new DomainException('Invalid status.');
