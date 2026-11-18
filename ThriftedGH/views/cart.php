@@ -6,20 +6,39 @@ $items=[];$total=0;$unavailable=false;$loadError=false;
 try { if(authCurrentUser()) { $items=(new CartClass())->items((int)$_SESSION['user_id']); foreach($items as $item) { $total+=CommerceModel::cents($item['price']); $unavailable=$unavailable || !$item['purchasable']; } } }
 catch(Throwable $e) { commerce_error($e); $loadError=true; }
 require __DIR__.'/layout/header.php';
+$sellerCount=count(array_unique(array_column($items,'seller_id')));
 ?>
-<section class="section"><div class="container"><h1>Your shopping cart</h1>
+<section class="section tg-page"><div class="container tg-wrap">
+<?php $stepCurrent=1; require __DIR__.'/components/checkout_steps.php'; ?>
+<h1 class="tg-title">Your cart</h1>
 <?php tgh_render_flash(); if(!$navLoggedIn): ?>
-<p>Log in to keep your cart securely linked to your account.</p><a class="btn btn-primary" href="<?=tgh_e($basePath)?>index.php?page=login">Log in</a>
-<?php elseif($loadError): ?><p role="alert">Your cart is temporarily unavailable. Please reload this page.</p>
-<?php elseif(!$items): ?><p>Your cart is empty.</p><a class="btn btn-primary" href="<?=tgh_e($basePath)?>index.php?page=shop">Browse the shop</a>
-<?php else: ?><p><?=count($items)?> unique <?=count($items)===1?'item':'items'?> from <?=count(array_unique(array_column($items,'seller_id')))?> <?=count(array_unique(array_column($items,'seller_id')))===1?'seller':'sellers'?>. Each item has quantity one.</p>
-<div class="cart-layout-grid"><div class="cart-items-wrapper">
-<?php foreach($items as $item): ?><article class="cart-item-row">
-<div class="cart-item-info"><img class="cart-item-thumb" src="<?=tgh_e($basePath.tgh_catalogue_image($item['image_path']))?>" alt="<?=tgh_e($item['title'])?>"><div><h2 class="cart-item-name"><?=tgh_e($item['title'])?></h2><p>Size <?=tgh_e($item['size']?:'Not specified')?> · <?=tgh_e(str_replace('_',' ',$item['item_condition']))?></p><?php if(!$item['purchasable']): ?><p role="alert">Unavailable — remove to continue.</p><?php endif; ?></div></div>
-<div class="cart-item-seller"><?=tgh_e($item['seller_name'])?></div><div class="cart-item-price"><?=tgh_e(tgh_format_price($item['price']))?></div>
-<form method="post" action="<?=tgh_e($basePath)?>actions/cart.php"><?=tgh_csrf_field()?><input type="hidden" name="product_id" value="<?=(int)$item['product_id']?>"><button class="btn btn-outline" name="action" value="remove">Remove</button></form>
-</article><?php endforeach; ?></div>
-<aside class="order-summary-card"><h2>Order summary</h2><p>Total: <strong>GH₵ <?=CommerceModel::money($total)?></strong></p><p>No delivery fee is added by this checkout.</p><p>Items are only reserved when you proceed to payment.</p>
-<?php if(!$unavailable): ?><a class="btn btn-primary" href="<?=tgh_e($basePath)?>index.php?page=checkout">Proceed to checkout</a><?php else: ?><p>Remove unavailable items before checkout.</p><?php endif; ?></aside></div>
-<?php endif; ?></div></section>
+<div class="tg-card tg-empty"><div class="tg-empty-icon">🔐</div><h2>Log in to see your cart</h2><p>Your cart stays linked to your account, so you can pick up where you left off.</p><a class="btn btn-primary" href="<?=tgh_e($basePath)?>index.php?page=login">Log in</a></div>
+<?php elseif($loadError): ?><div class="tg-note tg-note-warn" role="alert">Your cart is temporarily unavailable. Please reload this page.</div>
+<?php elseif(!$items): ?>
+<div class="tg-card tg-empty"><div class="tg-empty-icon">🛍️</div><h2>Your cart is empty</h2><p>Every piece here is one of one, so good finds go fast. Have a look around.</p><a class="btn btn-primary" href="<?=tgh_e($basePath)?>index.php?page=shop">Browse the shop</a></div>
+<?php else: ?>
+<p class="tg-sub"><?=count($items)?> <?=count($items)===1?'piece':'pieces'?> from <?=$sellerCount?> <?=$sellerCount===1?'seller':'sellers'?>. Each piece is one of one, so quantity is always 1.</p>
+<div class="tg-grid">
+<div class="tg-card tg-list">
+<?php foreach($items as $item): ?>
+<article class="tg-line">
+<img class="tg-thumb" src="<?=tgh_e($basePath.tgh_catalogue_image($item['image_path']))?>" alt="<?=tgh_e($item['title'])?>">
+<div class="tg-line-body"><h3><?=tgh_e($item['title'])?></h3><p class="tg-meta">Size <?=tgh_e($item['size']?:'not specified')?> · <?=tgh_e(str_replace('_',' ',$item['item_condition']))?></p><p class="tg-meta">Sold by <?=tgh_e($item['seller_name'])?></p>
+<?php if(!$item['purchasable']): ?><p class="tg-flag" role="alert">No longer available. Remove it to continue.</p><?php endif; ?></div>
+<div class="tg-price"><?=tgh_e(tgh_format_price($item['price']))?></div>
+<form method="post" action="<?=tgh_e($basePath)?>actions/cart.php"><?=tgh_csrf_field()?><input type="hidden" name="product_id" value="<?=(int)$item['product_id']?>"><button class="tg-icon-btn" name="action" value="remove" aria-label="Remove <?=tgh_e($item['title'])?> from cart" title="Remove">✕</button></form>
+</article>
+<?php endforeach; ?>
+</div>
+<aside class="tg-card tg-summary"><h2>Order summary</h2>
+<dl class="tg-rows"><div><dt>Subtotal (<?=count($items)?> <?=count($items)===1?'piece':'pieces'?>)</dt><dd>GH₵ <?=CommerceModel::money($total)?></dd></div><div><dt>Delivery fee</dt><dd>None added</dd></div></dl>
+<div class="tg-total"><span>Total</span><strong>GH₵ <?=CommerceModel::money($total)?></strong></div>
+<?php if(!$unavailable): ?><a class="btn btn-primary tg-block" href="<?=tgh_e($basePath)?>index.php?page=checkout">Continue to checkout</a>
+<?php else: ?><div class="tg-note tg-note-warn">Remove the unavailable pieces to continue.</div><?php endif; ?>
+<a class="tg-link-center" href="<?=tgh_e($basePath)?>index.php?page=shop">Keep browsing</a>
+<ul class="tg-ticks"><li>Pieces are only held once you start payment</li><li>Secure payment by Paystack</li><li>The seller ships after your payment is confirmed</li></ul>
+</aside>
+</div>
+<?php endif; ?>
+</div></section>
 <?php require __DIR__.'/layout/footer.php'; ?>

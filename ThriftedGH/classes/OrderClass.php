@@ -82,7 +82,11 @@ class OrderClass extends CommerceModel {
     public function listing($user, $scope) {
         if ($scope==='admin' && $user['role']==='admin') return $this->fetchAll('SELECT * FROM orders ORDER BY order_id DESC LIMIT 200');
         if ($scope==='seller') return $this->fetchAll("SELECT DISTINCT o.order_id,o.order_reference,o.payment_status,o.created_at FROM orders o JOIN order_items oi ON oi.order_id=o.order_id JOIN seller_profiles sp ON sp.seller_id=oi.seller_id WHERE sp.user_id=? AND o.payment_status='paid' ORDER BY o.order_id DESC LIMIT 200",'i',[$user['user_id']]);
-        return $this->fetchAll('SELECT * FROM orders WHERE buyer_id=? ORDER BY order_id DESC LIMIT 200','i',[$user['user_id']]);
+        return $this->fetchAll("SELECT o.*,
+            (SELECT COUNT(*) FROM order_items oi WHERE oi.order_id=o.order_id) AS item_count,
+            (SELECT GROUP_CONCAT(p.image_path SEPARATOR '|') FROM order_items oi JOIN products p ON p.product_id=oi.product_id WHERE oi.order_id=o.order_id) AS thumbs,
+            (SELECT oi.title_at_purchase FROM order_items oi WHERE oi.order_id=o.order_id ORDER BY oi.order_item_id LIMIT 1) AS first_title
+            FROM orders o WHERE o.buyer_id=? ORDER BY o.order_id DESC LIMIT 200",'i',[$user['user_id']]);
     }
     public function detail($user,$id,$scope) {
         $o=$this->fetchOne('SELECT * FROM orders WHERE order_id=?','i',[$id]);
@@ -90,12 +94,12 @@ class OrderClass extends CommerceModel {
         $admin=$scope==='admin' && $user['role']==='admin';
         if ($scope==='seller') {
             if ($o['payment_status']!=='paid') return null;
-            $items=$this->fetchAll('SELECT oi.*,sp.shop_name FROM order_items oi JOIN seller_profiles sp ON sp.seller_id=oi.seller_id WHERE oi.order_id=? AND sp.user_id=?','ii',[$id,$user['user_id']]);
+            $items=$this->fetchAll('SELECT oi.*,sp.shop_name,p.image_path FROM order_items oi JOIN seller_profiles sp ON sp.seller_id=oi.seller_id LEFT JOIN products p ON p.product_id=oi.product_id WHERE oi.order_id=? AND sp.user_id=?','ii',[$id,$user['user_id']]);
             if (!$items) return null;
             unset($o['total_amount'],$o['buyer_id'],$o['payment_review']);
         } else {
             if (!$admin && (int)$o['buyer_id']!==(int)$user['user_id']) return null;
-            $items=$this->fetchAll('SELECT oi.*,sp.shop_name FROM order_items oi JOIN seller_profiles sp ON sp.seller_id=oi.seller_id WHERE oi.order_id=?','i',[$id]);
+            $items=$this->fetchAll('SELECT oi.*,sp.shop_name,p.image_path FROM order_items oi JOIN seller_profiles sp ON sp.seller_id=oi.seller_id LEFT JOIN products p ON p.product_id=oi.product_id WHERE oi.order_id=?','i',[$id]);
         }
         $o['items']=$items; return $o;
     }
