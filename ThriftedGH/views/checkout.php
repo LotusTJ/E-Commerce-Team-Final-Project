@@ -7,6 +7,6 @@ try { $model=new OrderClass();$model->expire(); $items=(new CartClass())->items(
 $pageTitle='Checkout | ThriftedGH';require __DIR__.'/layout/header.php'; ?>
 <section class="section"><div class="container"><h1>Checkout</h1><?php tgh_render_flash(); ?>
 <?php if(!$ready): ?><p>Your cart is empty or contains unavailable items.</p><a href="<?=tgh_e($basePath)?>index.php?page=cart">Return to cart</a>
-<?php else: ?><p><?=count($items)?> items · Total GH₵ <?=CommerceModel::money($total)?></p><p>Paystack test checkout. No real payment is required. Your items will be held for 15 minutes.</p>
-<form method="post" action="<?=tgh_e($basePath)?>actions/checkout.php"><?=tgh_csrf_field()?><label for="delivery_address">Delivery address</label><textarea class="form-control" id="delivery_address" name="delivery_address" required minlength="10" maxlength="2000" rows="4"></textarea><button class="btn btn-primary" type="submit">Continue to Paystack test payment</button></form>
+<?php else: ?><p><?=count($items)?> items · Total GH₵ <?=CommerceModel::money($total)?></p><p>Secure checkout with Paystack. Your items will be held for 15 minutes.</p>
+<form method="post" action="<?=tgh_e($basePath)?>actions/checkout.php"><?=tgh_csrf_field()?><label for="delivery_address">Delivery address</label><textarea class="form-control" id="delivery_address" name="delivery_address" required minlength="10" maxlength="2000" rows="4"></textarea><button class="btn btn-primary" type="submit">Pay with Paystack</button></form>
 <?php endif; ?></div></section><?php require __DIR__.'/layout/footer.php'; ?>
