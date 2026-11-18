@@ -78,6 +78,12 @@ if (!isset($activeNav)) {
                            Sellers
                         </a>
                     </li>
+                    <li class="nav-item">
+                        <a href="<?php echo $basePath; ?>views/find_my_fit.php"
+                           class="nav-link <?php echo ($activeNav === 'find_my_fit') ? 'active' : ''; ?>">
+                           Find My Fit
+                        </a>
+                    </li>
                     <?php if ($navLoggedIn): ?>
                     <li class="nav-item">
                         <a href="<?php echo $basePath; ?>views/buyer/dashboard.php"
