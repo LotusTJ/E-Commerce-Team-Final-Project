@@ -30,7 +30,7 @@ class PaystackService {
         $raw=curl_exec($ch); $status=curl_getinfo($ch,CURLINFO_HTTP_CODE); curl_close($ch);
         if ($raw===false) throw new PaystackRequestException('Payment provider could not be reached. Check this order before starting another checkout.');
         try { $result=json_decode($raw,true,512,JSON_THROW_ON_ERROR); }
-        catch (JsonException $e) { throw new PaystackRequestException('Payment provider returned an unreadable response. Check this order before trying again.'); }
+        catch (JsonException $e) { error_log('Paystack unreadable response: HTTP '.$status.' body='.substr(preg_replace('/\s+/',' ',(string)$raw),0,300)); throw new PaystackRequestException('Payment provider returned an unreadable response. Check this order before trying again.'); }
         if ($status<200 || $status>=300 || ($result['status']??false)!==true || !is_array($result['data']??null)) {
             $message=is_string($result['message']??null)?$result['message']:'';
             $known=[
