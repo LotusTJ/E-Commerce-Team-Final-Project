@@ -10,7 +10,9 @@ if (!function_exists('renderProductCard')) {
         $conditionClass = 'condition-' . strtolower(str_replace('_', '-', $product['item_condition']));
         $conditionName = $product['condition_label'] ?? ucwords(str_replace('_', ' ', $product['item_condition']));
         $productUrl = tgh_url('views/public/product.php') . '?id=' . (int)$product['product_id'];
-        $loggedIn = !empty($_SESSION['user_id']);
+        $cardUser = function_exists('authCurrentUser') ? authCurrentUser() : null;
+        $loggedIn = $cardUser !== null;
+        $canBuy = $cardUser === null || $cardUser['role'] === 'buyer';
         ?>
         <article class="product-card" data-category="<?php echo tgh_e($product['category_name'] ?? ''); ?>" data-size="<?php echo tgh_e($product['size'] ?? ''); ?>">
             <div class="product-image-wrap">
@@ -42,13 +44,13 @@ if (!function_exists('renderProductCard')) {
 
                     <div class="product-actions">
                         <a href="<?php echo tgh_e($productUrl); ?>" class="btn btn-sm btn-outline">Details</a>
-                        <?php if ($loggedIn): ?>
+                        <?php if ($loggedIn && $canBuy): ?>
                             <form method="post" action="<?php echo tgh_e(tgh_url('actions/cart/add.php')); ?>">
                                 <?php echo tgh_csrf_field(); ?>
                                 <input type="hidden" name="product_id" value="<?php echo (int)$product['product_id']; ?>">
                                 <button class="btn btn-sm btn-primary" type="submit">Add to cart</button>
                             </form>
-                        <?php else: ?>
+                        <?php elseif (!$loggedIn): ?>
                             <a class="btn btn-sm btn-primary" href="<?php echo tgh_e(tgh_url('views/auth/login.php')); ?>">Log in to buy</a>
                         <?php endif; ?>
                     </div>

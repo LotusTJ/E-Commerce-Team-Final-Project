@@ -2672,3 +2672,16 @@ textarea.form-control { display: block; width: 100%; max-width: 40rem; margin: .
 .field-error { margin: .35rem 0 0; font-size: .82rem; color: #b42318; }
 .password-toggle .eye-closed, .password-toggle.is-visible .eye-open { display: none; }
 .password-toggle.is-visible .eye-closed { display: block; }
+
+.brand-portal {
+    display: inline-block;
+    margin-left: 0.4rem;
+    padding: 0.1rem 0.5rem;
+    border: 1px solid currentColor;
+    border-radius: 999px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    vertical-align: middle;
+}

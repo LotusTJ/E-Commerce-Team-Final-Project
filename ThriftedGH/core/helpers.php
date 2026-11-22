@@ -103,9 +103,25 @@ function tgh_format_price($amount)
     return 'GH₵ ' . number_format((float)$amount, 2);
 }
 
-function tgh_login_url()
+function tgh_login_url($portal = 'buyer')
 {
-    return tgh_url('views/auth/login.php');
+    $pages = [
+        'buyer' => 'views/auth/login.php',
+        'seller' => 'views/auth/seller_login.php',
+        'admin' => 'views/auth/admin_login.php',
+    ];
+    return tgh_url($pages[$portal] ?? $pages['buyer']);
+}
+
+function tgh_role_home($role)
+{
+    if ($role === 'seller') {
+        return tgh_url('views/seller/dashboard.php');
+    }
+    if ($role === 'admin') {
+        return tgh_url('views/admin/dashboard.php');
+    }
+    return tgh_url('views/public/home.php');
 }
 
 function tgh_load_card_component()

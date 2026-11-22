@@ -11,10 +11,16 @@ def sess():
 def tok(s, path):
     m = re.search(r'name="csrf_token" value="([0-9a-f]+)"', s.get(f"{B}/{path}").text)
     return m.group(1) if m else ""
-def login(email, pw="demo1234"):
+PORTALS = {"buyer": ("views/auth/login.php", "actions/auth/login.php"), "seller": ("views/auth/seller_login.php", "actions/auth/seller_login.php"), "admin": ("views/auth/admin_login.php", "actions/auth/admin_login.php")}
+def portal_for(email):
+    if email.startswith("admin@"): return "admin"
+    if email.split("@")[0] in ("ama", "kojo"): return "seller"
+    return "buyer"
+def login(email, pw="demo1234", portal=None):
     s = sess()
-    t = tok(s, "views/auth/login.php")
-    r = s.post(f"{B}/actions/auth/login.php", data={"email": email, "password": pw, "csrf_token": t}, allow_redirects=False)
+    page, action = PORTALS[portal or portal_for(email)]
+    t = tok(s, page)
+    r = s.post(f"{B}/{action}", data={"email": email, "password": pw, "csrf_token": t}, allow_redirects=False)
     return s, r
 def png(): 
     b = io.BytesIO(); Image.new("RGB", (40, 40), (10, 100, 10)).save(b, "PNG"); return b.getvalue()
@@ -23,13 +29,13 @@ def get(s, path, **k): return s.get(f"{B}/{path}", allow_redirects=False, **k)
 PAGES = {
  "views/buyer/dashboard.php": "login", "views/buyer/orders.php": "login", "views/buyer/checkout.php": "login",
  "views/buyer/find_my_fit.php": "login", "views/seller/apply.php": "login", "views/seller/documents.php": "login",
- "views/seller/dashboard.php": "login", "views/seller/orders.php": "login", "views/seller/product_form.php": "login",
+ "views/seller/dashboard.php": "seller_login", "views/seller/orders.php": "seller_login", "views/seller/product_form.php": "seller_login",
  "views/admin/dashboard.php": "login", "views/admin/applications.php": "login", "views/admin/orders.php": "login",
 }
 print("== anonymous ==")
 a = sess()
 for p in PAGES:
-    r = get(a, p); check(f"anon redirected from {p}", r.status_code == 302 and r.headers["Location"].endswith("views/auth/login.php"), r.status_code)
+    r = get(a, p); check(f"anon redirected from {p}", r.status_code == 302 and r.headers["Location"].endswith(f"views/auth/{PAGES[p]}.php"), r.status_code)
 for act in ["actions/admin/review_application.php","actions/documents/upload.php","actions/products/create.php","actions/orders/fulfil.php","actions/cart/add.php","actions/checkout/start.php"]:
     r = a.post(f"{B}/{act}", data={}, allow_redirects=False); check(f"anon POST {act} blocked", r.status_code in (302,401,403) and r.status_code != 200, r.status_code)
 r = get(a, "actions/documents/download.php?id=1"); check("anon cannot download documents", r.status_code in (302,401,403), r.status_code)
@@ -115,6 +121,44 @@ r = ap.get(f"{B}/views/seller/dashboard.php", allow_redirects=False); check("app
 r = up(ap, "late.png", png(), "image/png"); page = get(ap, "views/seller/documents.php").text
 check("no uploads after approval", "late.png" not in page)
 
+print("== separate login portals ==")
+def attempt(email, portal, pw="demo1234"):
+    s, r = login(email, pw, portal)
+    back = r.headers.get("Location", "")
+    return s, r, back
+for who, em, bad_portal in [("seller", "ama@demo.com", "buyer"), ("buyer", "efua@demo.com", "seller")]:
+    s_, r, back = attempt(em, bad_portal)
+    check(f"{who} credentials refused on the {bad_portal} login", back.endswith(PORTALS[bad_portal][0]) and get(s_, "views/buyer/dashboard.php").status_code == 302, back)
+    msg = s_.get(f"{B}/{PORTALS[bad_portal][0]}").text
+    check(f"{who} sent to the right login with a clear message", ("seller login" in msg.lower() or "buyer login" in msg.lower()))
+for em, portal in [("admin@demo.com", "buyer"), ("admin@demo.com", "seller"), ("efua@demo.com", "admin"), ("ama@demo.com", "admin")]:
+    s_, r, back = attempt(em, portal)
+    page = s_.get(f"{B}/{PORTALS[portal][0]}").text
+    check(f"{em} refused on the {portal} login without leaking roles", back.endswith(PORTALS[portal][0]) and "do not match an account" in page and get(s_, "views/admin/dashboard.php").status_code == 302, back)
+s_, r, back = attempt("efua@demo.com", "buyer"); check("buyer logs in on the buyer login", back.endswith("views/public/home.php"), back)
+s_, r, back = attempt("ama@demo.com", "seller"); check("seller logs in on the seller login and lands on the seller dashboard", back.endswith("views/seller/dashboard.php"), back)
+s_, r, back = attempt("admin@demo.com", "admin"); check("admin logs in on the admin login and lands on the admin dashboard", back.endswith("views/admin/dashboard.php"), back)
+for pth in ["views/public/home.php", "views/public/shop.php", "views/auth/login.php", "views/auth/seller_login.php", "views/auth/register.php", "views/public/sellers.php"]:
+    check(f"no link to the admin login on {pth}", "admin_login" not in requests.get(f"{B}/{pth}").text)
+adm = requests.get(f"{B}/views/auth/admin_login.php")
+check("admin login page is not indexed and has no site navigation", "noindex" in adm.text and ">Shop<" not in adm.text and "Find My Fit" not in adm.text)
+sl = requests.get(f"{B}/views/auth/seller_login.php").text
+check("seller login page has no shopper navigation", ">Shop<" not in sl and "Cart" not in sl and "Find My Fit" not in sl)
+sj, r, back = attempt("ama@demo.com", "seller")
+for pth in ["views/seller/dashboard.php", "views/public/home.php", "views/public/shop.php"]:
+    html = re.search(r'<nav class="main-nav".*?</nav>', get(sj, pth).text, re.S).group(0)
+    check(f"seller navbar on {pth} has no Home, Shop, Find My Fit or Cart", all(x not in html for x in [">Home<", ">Shop<", "Find My Fit", "nav-cart-link", ">Sellers<"]))
+html = get(sj, "views/seller/dashboard.php").text
+check("seller navbar shows Dashboard, Add a piece, Sales and Logout", all(x in html for x in [">Dashboard<", ">Add a piece<", ">Sales<", ">Logout<"]))
+check("seller does not see announcement bar or shopper footer", "announcement-bar" not in html and "footer-links-col" not in html)
+pid = re.search(r'product.php\?id=(\d+)', get(sj, "views/public/shop.php").text)
+if pid:
+    check("seller sees no Add to cart on a product page", "Add to cart" not in get(sj, f"views/public/product.php?id={pid.group(1)}").text)
+aj, r, back = attempt("admin@demo.com", "admin")
+html = get(aj, "views/admin/dashboard.php").text
+check("admin navbar has no shopper links", all(x not in html for x in [">Home<", ">Shop<", "Find My Fit", "nav-cart-link"]) and all(x in html for x in [">Applications<", ">Orders<", ">Logout<"]))
+r = get(sj, "actions/auth/logout.php"); check("seller logout returns to the seller login", r.headers.get("Location", "").endswith("views/auth/seller_login.php"), r.headers.get("Location"))
+
 print("== login lockout ==")
 import subprocess
 subprocess.run(["mysql","-utgh","-ptghpass","thriftedgh","-e","delete from login_attempts"])
@@ -127,9 +171,9 @@ ok2, r = login("efua@demo.com", "demo1234"); check("login works again after lock
 hdr = requests.get(f"{B}/views/public/home.php").headers
 check("security headers present", hdr.get("X-Content-Type-Options") == "nosniff" and hdr.get("X-Frame-Options") == "SAMEORIGIN" and "Referrer-Policy" in hdr)
 print("== session handling ==")
-r = get(ad, "actions/auth/logout.php"); check("logout redirects", r.status_code == 302)
+r = get(ad, "actions/auth/logout.php"); check("admin logout returns to the admin login", r.status_code == 302 and r.headers["Location"].endswith("views/auth/admin_login.php"), r.headers.get("Location"))
 r = get(ad, "views/admin/dashboard.php"); check("admin page blocked after logout", r.status_code == 302 and r.headers["Location"].endswith("views/auth/login.php"), r.status_code)
 forged = sess(); forged.cookies.set("PHPSESSID", "admin"); r = get(forged, "views/admin/dashboard.php"); check("forged session id gets nowhere", r.status_code == 302)
-bad_login, r = login("admin@demo.com", "wrongpass"); check("wrong password rejected", r.status_code == 302 and r.headers["Location"].endswith("views/auth/login.php"))
+bad_login, r = login("admin@demo.com", "wrongpass"); check("wrong password rejected", r.status_code == 302 and r.headers["Location"].endswith("views/auth/admin_login.php"))
 r = get(bad_login, "views/admin/dashboard.php"); check("failed login does not grant admin", r.status_code == 302)
 print(f"\n{ok} passed, {bad} failed"); sys.exit(1 if bad else 0)

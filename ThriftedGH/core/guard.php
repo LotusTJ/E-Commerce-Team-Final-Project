@@ -18,13 +18,15 @@ function guardDeny($code, $message)
     }
     $pageTitle = 'Access denied | ThriftedGH';
     $activeNav = '';
+    $denyUser = authCurrentUser();
+    $denyRole = $denyUser ? $denyUser['role'] : 'buyer';
     require __DIR__ . '/../views/layout/header.php';
-    echo '<section class="section"><div class="container"><div class="empty-state-card"><h1>' . ($code === 401 ? 'Please log in' : 'Access denied') . '</h1><p>' . htmlspecialchars($message, ENT_QUOTES, 'UTF-8') . '</p><a class="btn btn-primary" href="' . htmlspecialchars(tgh_url('views/public/home.php'), ENT_QUOTES, 'UTF-8') . '">Back to home</a></div></div></section>';
+    echo '<section class="section"><div class="container"><div class="empty-state-card"><h1>' . ($code === 401 ? 'Please log in' : 'Access denied') . '</h1><p>' . htmlspecialchars($message, ENT_QUOTES, 'UTF-8') . '</p><a class="btn btn-primary" href="' . htmlspecialchars(tgh_role_home($denyRole), ENT_QUOTES, 'UTF-8') . '">' . ($denyRole === 'buyer' ? 'Back to home' : 'Back to dashboard') . '</a></div></div></section>';
     require __DIR__ . '/../views/layout/footer.php';
     exit;
 }
 
-function guardRequireLogin()
+function guardRequireLogin($portal = 'buyer')
 {
     $user = authCurrentUser();
     if ($user === null) {
@@ -34,7 +36,7 @@ function guardRequireLogin()
         if (!guardIsPageRequest()) {
             guardDeny(401, 'Please log in first.');
         }
-        header('Location: ' . tgh_url('views/auth/login.php'));
+        header('Location: ' . tgh_login_url($portal));
         exit;
     }
     return $user;
@@ -42,7 +44,7 @@ function guardRequireLogin()
 
 function guardRequireRole($role)
 {
-    $user = guardRequireLogin();
+    $user = guardRequireLogin($role === 'seller' ? 'seller' : 'buyer');
     if ($user['role'] !== $role) {
         guardDeny(403, 'This area is only for ' . ($role === 'admin' ? 'administrators' : 'approved ' . $role . 's') . '.');
     }
@@ -56,7 +58,7 @@ function guardRequireAdmin()
 
 function guardRequireSeller()
 {
-    $user = guardRequireLogin();
+    $user = guardRequireLogin('seller');
     if ($user['role'] === 'admin') {
         guardDeny(403, 'Administrator accounts cannot use seller tools.');
     }

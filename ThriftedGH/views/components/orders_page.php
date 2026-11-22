@@ -9,7 +9,7 @@ try {
  else $orders=$model->listing($user,$scope);
  if($scope==='admin') $summary=$model->reconciliation();
 } catch(Throwable $e) {commerce_error($e);$loadError=true;}
-$pageTitle='Orders | ThriftedGH';$activeNav=$scope==='buyer'?'orders':$scope;require __DIR__.'/../layout/header.php';
+$pageTitle='Orders | ThriftedGH';$activeNav=$scope==='buyer'?'orders':$scope.'_orders';require __DIR__.'/../layout/header.php';
 $scopeUrls=['buyer'=>tgh_url('views/buyer/orders.php'),'seller'=>tgh_url('views/seller/orders.php'),'admin'=>tgh_url('views/admin/orders.php')];
 $ordersUrl=$scopeUrls[$scope];
 $titles=['buyer'=>'Your orders','seller'=>'Sales from your shop','admin'=>'Order administration'];

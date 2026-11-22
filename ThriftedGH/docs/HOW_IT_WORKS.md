@@ -6,14 +6,14 @@ ThriftedGH follows the MVC pattern. Every page is its own file, every form posts
 
 - `views/` is the View. It only shows things. Each page is one file, grouped by who may open it.
   - `views/public/` home, shop, product, sellers, storefront (anyone)
-  - `views/auth/` login, register
+  - `views/auth/` buyer login, seller login, admin login, register
   - `views/buyer/` account, cart, checkout, orders, payment result, find my fit (logged in)
   - `views/seller/` apply, documents, dashboard, product form, sales (approved sellers; apply and documents for applicants)
   - `views/admin/` dashboard, applications, orders (admins only)
   - `views/layout/` header and footer shared by every page
   - `views/components/` small reusable pieces (product card, order status helpers)
 - `actions/` is where forms post to. One file does one thing, then redirects. Grouped by area: `auth`, `cart`, `checkout`, `orders`, `products`, `fit`, `seller`, `admin`, `documents`.
-- `controllers/` is the Controller logic that actions and views call: validation, rules and "what should happen". `Product.php`, `Seller.php`, `Fit.php`, `Cart.php`, `Order.php`, `Document.php`.
+- `controllers/` is the Controller logic that actions and views call: validation, rules and "what should happen". `Product.php`, `Seller.php`, `Fit.php`, `Cart.php`, `Order.php`, `Document.php`, `Login.php`.
 - `classes/` is the Model. These are the only files that talk to the database: `UserClass`, `SellerClass`, `ProductClass`, `CatalogueRepository`, `CartClass`, `OrderClass`, `CommerceModel`, `FitClass`, `DocumentClass`, `AdminClass`.
 - `core/` is shared plumbing: database connection (`db_class.php`, `db_config.php`), session (`session.php`), login helpers (`auth.php`), the role guard (`guard.php`), small helpers (`helpers.php`), URL builder (`paths.php`) and the SVG icon helper (`icons.php`).
 - `payments/` talks to Paystack: `PaystackService.php`, the `callback.php` the buyer returns to, and the `webhook.php` Paystack calls.
@@ -44,8 +44,20 @@ Every action follows the same shape: guard, validate, call the model, flash mess
 
 - Every protected page and action starts with a guard from `core/guard.php`: `guardRequireLogin()`, `guardRequireSeller()` or `guardRequireAdmin()`.
 - The role is read from the database on every request. It is never trusted from the session or from a form field, so changing a cookie or URL cannot make someone an admin.
-- Logged-out visitors are sent to the login page. Logged-in users without the right role get a 403 page. Actions answer 403 as plain text.
+- Logged-out visitors are sent to the buyer login, or to the seller login for seller pages. Logged-in users without the right role get a 403 page. Actions answer 403 as plain text.
 - Admin pages: only `users.role = 'admin'`. Seller pages: only approved sellers. Admins cannot use seller tools and sellers cannot open admin pages.
+
+## Three logins
+
+Each kind of user has its own login page and its own action file. They share one check in `controllers/Login.php`.
+
+- Buyers: `views/auth/login.php` posts to `actions/auth/login.php`. Lands on the home page.
+- Sellers: `views/auth/seller_login.php` posts to `actions/auth/seller_login.php`. Lands on the seller dashboard.
+- Admins: `views/auth/admin_login.php` posts to `actions/auth/admin_login.php`. Lands on the admin dashboard.
+
+The right account type is required on each page. A seller cannot log in on the buyer page and a buyer cannot log in on the seller page. The admin login is not linked from any page, menu or footer, is marked noindex, and shows a plain "do not match" message to anyone who is not an admin, so it never confirms that an account is an admin. Admin accounts are created in the database (`database/admin_seed.sql`), never through registration.
+
+The menu depends on the role. Sellers see Dashboard, Add a piece, Sales and Logout. Admins see Dashboard, Applications, Orders and Logout. Neither sees Home, Shop, Find My Fit or Cart, and neither gets "Add to cart" buttons. `views/layout/header.php` picks the menu and `views/layout/footer.php` picks the footer. Logging out sends sellers to the seller login and admins to the admin login.
 
 ## Document uploads
 

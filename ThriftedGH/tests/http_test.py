@@ -10,8 +10,9 @@ def check(v,label):
  assert v,label
  print('PASS: '+label)
 def login(email):
- c=client();status,page=get(c,'views/auth/login.php');csrf=re.search(r'name="csrf_token" value="([a-f0-9]+)"',page).group(1)
- status,body=get(c,'actions/auth/login.php',{'email':email,'password':'Member4-test-fixture','csrf_token':csrf})
+ portal='admin_' if email.startswith('admin@') else ('seller_' if email.startswith('a@') else '')
+ c=client();status,page=get(c,'views/auth/'+portal+'login.php');csrf=re.search(r'name="csrf_token" value="([a-f0-9]+)"',page).group(1)
+ status,body=get(c,'actions/auth/'+portal+'login.php',{'email':email,'password':'Member4-test-fixture','csrf_token':csrf})
  status,body=get(c,'views/public/home.php')
  check(status==200 and 'Logout' in body,'login '+email)
  return c

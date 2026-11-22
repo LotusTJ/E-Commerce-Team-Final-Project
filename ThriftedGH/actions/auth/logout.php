@@ -1,5 +1,10 @@
 <?php
-require_once __DIR__ . '/../../core/session.php';
+require_once __DIR__ . '/../../core/auth.php';
+require_once __DIR__ . '/../../core/paths.php';
+require_once __DIR__ . '/../../core/helpers.php';
+
+$user = authCurrentUser();
+$role = $user ? $user['role'] : 'buyer';
 
 $_SESSION = [];
 if (ini_get('session.use_cookies')) {
@@ -8,6 +13,9 @@ if (ini_get('session.use_cookies')) {
 }
 session_destroy();
 
-require_once __DIR__ . '/../../core/paths.php';
-header('Location: ' . tgh_url('views/public/home.php'));
+if ($role === 'seller' || $role === 'admin') {
+    header('Location: ' . tgh_login_url($role));
+} else {
+    header('Location: ' . tgh_url('views/public/home.php'));
+}
 exit;

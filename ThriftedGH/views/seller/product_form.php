@@ -53,7 +53,7 @@ $values = [
     'inseam' => tgh_field_value('inseam', $old, $product, 'inseam_cm')
 ];
 
-tgh_layout_start($editing ? 'Edit product' : 'Add a product', 'seller');
+tgh_layout_start($editing ? 'Edit product' : 'Add a product', 'seller_add');
 tgh_render_flash();
 ?>
 <section class="m3-head">

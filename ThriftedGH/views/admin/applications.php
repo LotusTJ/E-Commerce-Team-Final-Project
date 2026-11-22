@@ -8,7 +8,7 @@ $pending = application_pending_ctr();
 $recent = application_recent_ctr(10);
 $documents = new DocumentClass();
 
-tgh_layout_start('Seller applications', 'admin');
+tgh_layout_start('Seller applications', 'admin_applications');
 tgh_render_flash();
 ?>
 <section class="m3-head">

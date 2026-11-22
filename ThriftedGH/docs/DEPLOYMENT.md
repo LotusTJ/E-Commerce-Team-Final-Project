@@ -20,7 +20,8 @@ You need any host that gives you PHP 8.0 or newer with the `mysqli`, `curl` and 
 
 - Open `views/public/home.php` and the shop.
 - Log in as the admin and open the dashboard.
-- Log out and try `views/admin/dashboard.php`. You should land on the login page.
+- The admin logs in at `views/auth/admin_login.php`. Keep that address to yourselves, it is not linked anywhere on the site.
+- Log out and try `views/admin/dashboard.php`. You should land on the buyer login page.
 - Register a buyer, add a piece to the cart and run a test payment with a Paystack test card.
 - Apply as a seller, upload a PDF or image, and approve it from the admin account.
 
