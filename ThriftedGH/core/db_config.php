@@ -1,5 +1,4 @@
 <?php
-// An existing private db_cred.php remains supported; new installs can use environment variables.
 if (is_file(__DIR__.'/db_cred.php')) require_once __DIR__.'/db_cred.php';
 $defaults=[
     'DB_HOST'=>getenv('DB_HOST') ?: 'localhost',

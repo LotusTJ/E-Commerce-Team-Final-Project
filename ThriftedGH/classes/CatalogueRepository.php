@@ -1,5 +1,4 @@
 <?php
-/** Task 6: read-only public catalogue queries. No sample inventory. */
 require_once __DIR__ . '/../core/db_class.php';
 class CatalogueRepository {
     private $db;
@@ -35,7 +34,7 @@ class CatalogueRepository {
     }
     public function detail($id) {
         $sql='SELECT p.*,c.category_name,sp.shop_name AS seller_name,sp.seller_type,sp.location,sp.description AS seller_description,pm.chest_cm,pm.waist_cm,pm.hips_cm,pm.inseam_cm'.$this->base();
-        // Add measurement join before WHERE in shared base.
+
         $sql=str_replace(" WHERE p.status",' LEFT JOIN product_measurements pm ON pm.product_id=p.product_id WHERE p.status',$sql);
         $rows=$this->rows($sql.' AND p.product_id=? LIMIT 1','i',[(int)$id]);
         return $rows[0]??null;

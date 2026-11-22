@@ -1,5 +1,4 @@
 <?php
-// Local development worker. On hosting, schedule reconcile_payments.php every minute instead.
 if (PHP_SAPI!=='cli') {http_response_code(404);exit;}
 $once=in_array('--once',$argv,true);
 $stop=false;

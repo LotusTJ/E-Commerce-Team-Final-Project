@@ -1,5 +1,4 @@
 <?php
-// Destructive fixtures only in an explicitly named, disposable test database.
 if (getenv('DB_NAME')!=='thriftedgh_member4_test') exit("Set DB_NAME=thriftedgh_member4_test for the isolated tests.\n");
 require_once __DIR__.'/../classes/OrderClass.php';
 require_once __DIR__.'/../classes/CartClass.php';
@@ -67,7 +66,7 @@ check((int)$late['payment_review']===1 && $late['payment_status']==='failed','la
 check((int)one('SELECT reservation_order_id id FROM products WHERE product_id=4')['id']===(int)$new['order_id'],'late charge cannot steal new reservation');
 check(one('SELECT COUNT(*) n FROM seller_earnings')['n']==2,'late payment creates no duplicate sale or earnings');
 $orders->fail($new['order_reference']);$cart->remove(2,4);$cart->remove(1,4);
-// Atomic rollback when one of multiple cart products becomes unavailable.
+
 $cart->add(1,5);$cart->add(1,6);sql("UPDATE products SET status='hidden' WHERE product_id=6");
 denied(fn()=>$orders->create(1,'Accra, test address'),'checkout revalidates availability');
 check(one('SELECT status FROM products WHERE product_id=5')['status']==='available','failed checkout rolls back whole reservation');
@@ -83,7 +82,7 @@ $sig='t='.$now.',v1=whk_test:'.hash_hmac('sha512',$now.'.'.$body,$signing);
 check(PaystackService::validSignature($body,$sig,'',$secret,$signing,$now),'timestamped webhook signature verified');
 check(!PaystackService::validSignature($body,$sig,'',$secret,$signing,$now+301),'old timestamped webhook rejected');
 check(!PaystackService::validSignature($body,'',hash_hmac('sha512',$body,$secret),$secret,$signing),'configured modern webhook cannot downgrade');
-// Check the provider contract without sending credentials or making a network request.
+
 class FakePaystack extends PaystackService {
     public $path; public $payload; public $response=['authorization_url'=>'https://checkout.paystack.com/test-fixture'];
     protected function request($path,$payload=null) {$this->path=$path;$this->payload=$payload;return $this->response;}
@@ -99,7 +98,7 @@ try {$provider->initialize($o);throw new LogicException('Untrusted payment URL a
 putenv('PAYSTACK_SECRET_KEY=sk_live_fixture');
 try {new PaystackService();throw new LogicException('Live key accepted');} catch(RuntimeException $e) {check(true,'live secret key rejected');}
 putenv('PAYSTACK_SECRET_KEY');
-// Real two-process race on a shared unique item.
+
 $cart->add(1,8);$cart->add(2,8);
 $worker=__DIR__.'/checkout_worker.php';$pipes=[];$processes=[];
 for($i=1;$i<=2;$i++) {$p=[];$processes[]=proc_open([PHP_BINARY,$worker,(string)$i],[1=>['pipe','w'],2=>['pipe','w']],$p);$pipes[]=$p;}

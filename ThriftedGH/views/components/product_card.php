@@ -1,96 +1,60 @@
 <?php
-/**
- * ThriftedGH - Reusable Product Card Component
- * 
- * Displays a single fashion item card with:
- * - Product image & condition badge
- * - Product title
- * - Clothing size
- * - Item condition
- * - Seller name
- * - Price in Ghana Cedis (GH₵)
- * - View details & Add to Cart action buttons
- * 
- * Can be used by setting $product before including this file,
- * or by calling renderProductCard($product, $basePath).
- */
-
 require_once __DIR__ . '/../../controllers/Cart.php';
-if (!function_exists('tgh_catalogue_image')) { require_once __DIR__ . '/../../classes/CatalogueRepository.php'; }
-if (!function_exists('renderProductCard')) {
-    function renderProductCard($product, $basePath = './') {
-        $product['image_path'] = tgh_catalogue_image($product['image_path'] ?? '');
-        $conditionClass = 'condition-' . strtolower(str_replace('_', '-', $product['item_condition']));
-        $conditionName = isset($product['condition_label']) ? $product['condition_label'] : ucwords(str_replace('_', ' ', $product['item_condition']));
-        $productUrl = $basePath . 'index.php?page=product&id=' . (int)$product['product_id'];
-        ?>
-        <article class="product-card" data-category="<?php echo htmlspecialchars($product['category_name'] ?? ''); ?>" data-size="<?php echo htmlspecialchars($product['size'] ?? ''); ?>">
-            <!-- Product Image & Badges -->
-            <div class="product-image-wrap">
-                <a href="<?php echo $productUrl; ?>" class="product-img-link" tabindex="-1" aria-hidden="true">
-                    <img src="<?php echo $basePath . htmlspecialchars($product['image_path']); ?>" 
-                         alt="<?php echo htmlspecialchars($product['title']); ?>" 
-                         class="product-image" 
-                         loading="lazy">
-                </a>
-                
-                <!-- Floating Condition Badge -->
-                <span class="product-badge <?php echo $conditionClass; ?>" title="Item Condition">
-                    <?php echo htmlspecialchars($conditionName); ?>
-                </span>
+require_once __DIR__ . '/../../classes/CatalogueRepository.php';
 
-                <!-- Clothing Size Tag -->
-                <span class="product-size-badge" title="Clothing Size">
-                    Size: <?php echo htmlspecialchars($product['size'] ?? 'Not specified'); ?>
-                </span>
+if (!function_exists('renderProductCard')) {
+    function renderProductCard($product, $basePath = null)
+    {
+        $basePath = $basePath ?? tgh_base();
+        $image = tgh_catalogue_image($product['image_path'] ?? '');
+        $conditionClass = 'condition-' . strtolower(str_replace('_', '-', $product['item_condition']));
+        $conditionName = $product['condition_label'] ?? ucwords(str_replace('_', ' ', $product['item_condition']));
+        $productUrl = tgh_url('views/public/product.php') . '?id=' . (int)$product['product_id'];
+        $loggedIn = !empty($_SESSION['user_id']);
+        ?>
+        <article class="product-card" data-category="<?php echo tgh_e($product['category_name'] ?? ''); ?>" data-size="<?php echo tgh_e($product['size'] ?? ''); ?>">
+            <div class="product-image-wrap">
+                <a href="<?php echo tgh_e($productUrl); ?>" class="product-img-link" tabindex="-1" aria-hidden="true">
+                    <img src="<?php echo tgh_e($basePath . $image); ?>" alt="<?php echo tgh_e($product['title']); ?>" class="product-image" loading="lazy">
+                </a>
+                <span class="product-badge <?php echo tgh_e($conditionClass); ?>"><?php echo tgh_e($conditionName); ?></span>
+                <span class="product-size-badge">Size <?php echo tgh_e($product['size'] ?? 'n/a'); ?></span>
             </div>
 
-            <!-- Product Card Content -->
             <div class="product-info">
                 <div class="product-meta">
-                    <span class="product-category"><?php echo htmlspecialchars($product['category_name'] ?? 'Vintage'); ?></span>
-                    <span class="product-stock-tag">1 of 1 piece</span>
+                    <span class="product-category"><?php echo tgh_e($product['category_name'] ?? 'Clothing'); ?></span>
+                    <span class="product-stock-tag">1 of 1</span>
                 </div>
 
-                <h3 class="product-title">
-                    <a href="<?php echo $productUrl; ?>">
-                        <?php echo htmlspecialchars($product['title']); ?>
-                    </a>
-                </h3>
+                <h3 class="product-title"><a href="<?php echo tgh_e($productUrl); ?>"><?php echo tgh_e($product['title']); ?></a></h3>
 
-                <!-- Seller Attribute -->
                 <div class="product-seller">
-                    <span class="seller-icon">🏷️</span>
-                    <span class="seller-text">Seller: <strong><?php echo htmlspecialchars($product['seller_name'] ?? 'Local Vendor'); ?></strong></span>
+                    <span class="seller-icon"><?php echo tgh_icon('tag'); ?></span>
+                    <span class="seller-text"><?php echo tgh_e($product['seller_name'] ?? 'Seller'); ?></span>
                 </div>
 
-                <!-- Price & Actions Footer -->
                 <div class="product-footer">
                     <div class="product-price-box">
                         <span class="currency">GH₵</span>
-                        <span class="amount"><?php echo number_format($product['price'], 2); ?></span>
+                        <span class="amount"><?php echo number_format((float)$product['price'], 2); ?></span>
                     </div>
 
                     <div class="product-actions">
-                        <a href="<?php echo $productUrl; ?>" class="btn btn-sm btn-outline" title="View garment details and measurements">
-                            Details
-                        </a>
-                        <form method="post" action="<?php echo htmlspecialchars($basePath); ?>actions/cart.php">
-                            <?php echo tgh_csrf_field(); ?>
-                            <input type="hidden" name="product_id" value="<?php echo (int)$product['product_id']; ?>">
-                            <?php if (!empty($_SESSION['user_id'])): ?><button class="btn btn-sm btn-primary" name="action" value="add">+ Cart</button>
-                            <?php else: ?><a class="btn btn-sm btn-primary" href="<?php echo htmlspecialchars($basePath); ?>index.php?page=login">Log in to buy</a><?php endif; ?>
-                        </form>
+                        <a href="<?php echo tgh_e($productUrl); ?>" class="btn btn-sm btn-outline">Details</a>
+                        <?php if ($loggedIn): ?>
+                            <form method="post" action="<?php echo tgh_e(tgh_url('actions/cart/add.php')); ?>">
+                                <?php echo tgh_csrf_field(); ?>
+                                <input type="hidden" name="product_id" value="<?php echo (int)$product['product_id']; ?>">
+                                <button class="btn btn-sm btn-primary" type="submit">Add to cart</button>
+                            </form>
+                        <?php else: ?>
+                            <a class="btn btn-sm btn-primary" href="<?php echo tgh_e(tgh_url('views/auth/login.php')); ?>">Log in to buy</a>
+                        <?php endif; ?>
                     </div>
                 </div>
             </div>
         </article>
         <?php
     }
-}
-
-// If included directly with $product set in scope, render it immediately
-if (isset($product) && is_array($product)) {
-    $currentBasePath = isset($basePath) ? $basePath : './';
-    renderProductCard($product, $currentBasePath);
 }

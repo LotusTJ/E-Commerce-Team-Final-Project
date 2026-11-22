@@ -8,3 +8,6 @@ core/*.local.php
 /tests/.runtime/
 
 /core/db_cred.php
+
+/storage/documents/*
+!/storage/documents/.gitkeep

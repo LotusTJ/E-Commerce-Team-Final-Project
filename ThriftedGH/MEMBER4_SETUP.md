@@ -33,7 +33,7 @@ The database configuration loader supports existing private credentials; removin
 - Set the test webhook to a publicly reachable HTTPS URL ending in `/payments/webhook.php`. Paystack cannot reach a plain localhost URL. A deployed test environment is suitable; keep real and test settings separate.
 - If your dashboard has a webhook signing secret (`whsec_…`), set `PAYSTACK_WEBHOOK_SECRET`. The handler then requires a timestamped `Paystack-Signature` and checks the five-minute replay window. Without that configuration it verifies legacy `X-Paystack-Signature` using the test API key.
 - Both callback and webhook verify the transaction with Paystack from the server. Settlement checks reference, successful status, integer amount in pesewas, GHS currency and test domain. Browser query parameters never mark an order paid.
-- A successful result is displayed at `index.php?page=payment_result&reference=...` only to the purchasing buyer.
+- A successful result is displayed at `views/buyer/payment_result.php?reference=...` only to the purchasing buyer.
 
 Provider documentation: [Accept payments](https://paystack.com/docs/payments/accept-payments/), [Verify payments](https://paystack.com/docs/payments/verify-payments/), [Webhooks](https://paystack.com/docs/payments/webhooks/).
 
@@ -54,12 +54,12 @@ On a Mac, the PHP executable is commonly `/Applications/XAMPP/xamppfiles/bin/php
 
 ## Pages and permissions
 
-- Cart: `index.php?page=cart`
-- Checkout: `index.php?page=checkout`
-- Buyer purchases: `index.php?page=orders`
-- Seller paid items: `index.php?page=orders&scope=seller`
-- Admin overview: `index.php?page=orders&scope=admin`
-- Details: append `&id=<order_id>` in the appropriate scope.
+- Cart: `views/buyer/cart.php`
+- Checkout: `views/buyer/checkout.php`
+- Buyer purchases: `views/buyer/orders.php`
+- Seller paid items: `views/seller/orders.php`
+- Admin overview: `views/admin/orders.php`
+- Details: append `?id=<order_id>` to any of the order pages above.
 
 Changing a URL or form ID does not grant access. Sellers receive only their own items and never another seller's totals. Their fulfilment progression is pending → processing → shipped → delivered and only applies to paid orders. An administrator sees aggregate verified sales, commissions, seller earnings and delivered gross sales. Payout execution and automatic refund operations are outside these tasks.
 

@@ -1,5 +1,4 @@
 <?php
-// Optional real-provider contract test. It submits an invalid email, never a valid charge.
 if (PHP_SAPI!=='cli' || getenv('RUN_PAYSTACK_SANDBOX_TESTS')!=='yes') {
     exit("Set RUN_PAYSTACK_SANDBOX_TESTS=yes only after configuring your private Paystack test key.\n");
 }

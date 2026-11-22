@@ -1,5 +1,4 @@
 <?php
-
 require_once __DIR__ . '/../classes/FitClass.php';
 require_once __DIR__ . '/Product.php';
 

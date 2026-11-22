@@ -1,5 +1,5 @@
 <?php
-require_once __DIR__ . '/core.php';
+require_once __DIR__ . '/session.php';
 require_once __DIR__ . '/db_class.php';
 
 function authCurrentUser()
@@ -23,13 +23,4 @@ function authIsAdmin()
 {
     $user = authCurrentUser();
     return $user !== null && $user['role'] === 'admin';
-}
-
-function authRequireAdmin()
-{
-    checkLogin();
-    if (!authIsAdmin()) {
-        http_response_code(403);
-        exit('Access denied');
-    }
 }

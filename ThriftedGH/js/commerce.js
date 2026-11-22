@@ -61,7 +61,7 @@
         return;
       }
       pay.classList.add('is-loading');
-      pay.textContent = 'Taking you to Paystack…';
+      pay.textContent = 'Taking you to Paystack...';
     });
 
     window.addEventListener('pageshow', function (event) {

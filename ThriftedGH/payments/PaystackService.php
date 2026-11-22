@@ -59,7 +59,6 @@ class PaystackService {
     public function verify($ref) { return $this->request('/transaction/verify/'.rawurlencode($ref)); }
     public static function validSignature($body,$modern,$legacy,$secret,$signingSecret,$now=null) {
         if ($signingSecret!=='') {
-            // When configured, require the timestamped signature; never downgrade.
             $timestamp=null; $signatures=[];
             foreach (explode(',',$modern) as $part) {
                 $kv=explode('=',trim($part),2);

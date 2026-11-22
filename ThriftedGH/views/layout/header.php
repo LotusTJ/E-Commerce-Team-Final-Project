@@ -1,20 +1,27 @@
 <?php
-/**
- * ThriftedGH - Shared Header Layout
- * Reusable navigation bar and head metadata for all marketplace views.
- */
+require_once __DIR__ . '/../../core/helpers.php';
+require_once __DIR__ . '/../../core/auth.php';
 
-// Determine base path so asset references work whether loaded via index.php or directly in views/
-$scriptPath = $_SERVER['SCRIPT_NAME'];
-$viewsPos = strpos($scriptPath, '/views/');
-$basePath = ($viewsPos !== false) ? str_repeat('../', substr_count(substr($scriptPath, $viewsPos + 7), '/') + 1) : './';
+$basePath = tgh_base();
+$navUser = null;
+try {
+    $navUser = authCurrentUser();
+} catch (Throwable $e) {
+    error_log('Header user lookup: ' . $e->getMessage());
+}
+$navLoggedIn = $navUser !== null;
+$navRole = $navLoggedIn ? $navUser['role'] : null;
 
-require_once __DIR__.'/../../core/session.php';
-$navLoggedIn = !empty($_SESSION['user_id']);
-
-// Current active navigation identifier
 if (!isset($activeNav)) {
-    $activeNav = isset($_GET['page']) ? trim($_GET['page']) : 'home';
+    $activeNav = basename($_SERVER['SCRIPT_NAME'] ?? '', '.php');
+}
+
+if (!function_exists('tgh_nav_link')) {
+    function tgh_nav_link($href, $label, $key, $active, $extra = '')
+    {
+        $class = trim('nav-link ' . $extra . ($active === $key ? ' active' : ''));
+        return '<li class="nav-item"><a class="' . htmlspecialchars($class, ENT_QUOTES, 'UTF-8') . '" href="' . htmlspecialchars(tgh_url($href), ENT_QUOTES, 'UTF-8') . '">' . $label . '</a></li>';
+    }
 }
 ?>
 <!DOCTYPE html>
@@ -22,106 +29,57 @@ if (!isset($activeNav)) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?php echo isset($pageTitle) ? htmlspecialchars($pageTitle) : 'ThriftedGH | Online Thrift Fashion Ghana'; ?></title>
-    
-    <!-- Meta description for fashion marketplace -->
-    <meta name="description" content="ThriftedGH is Ghana's premier online marketplace for curated second-hand fashion, vintage clothing, and sustainable thrift wear from local sellers.">
-    
-    <!-- Main Stylesheet -->
+    <title><?php echo isset($pageTitle) ? htmlspecialchars($pageTitle) : 'ThriftedGH | Second-hand clothing from Ghanaian sellers'; ?></title>
+    <meta name="description" content="Buy and sell second-hand clothing in Ghana. Every piece is one of one, listed by approved student and shop sellers.">
     <link rel="stylesheet" href="<?php echo $basePath; ?>css/style.css">
 </head>
 <body>
-
-    <!-- Top Announcement Bar -->
     <div class="announcement-bar">
         <div class="container announcement-content">
-            <span class="announcement-tag">🇬🇭 GHANA'S THRIFT HUB</span>
-            <span class="announcement-text">Curated vintage & pre-loved one-of-one pieces • Campus delivery & nationwide dispatch</span>
+            <span class="announcement-tag"><?php echo tgh_icon('map-pin'); ?> Ghana</span>
+            <span class="announcement-text">Second-hand pieces from approved sellers. Campus delivery and nationwide dispatch.</span>
         </div>
     </div>
 
-    <!-- Main Shared Navigation Bar -->
     <header class="site-header">
         <div class="container header-container">
-            <!-- Brand Logo -->
-            <a href="<?php echo $basePath; ?>index.php?page=home" class="brand-logo" aria-label="ThriftedGH Homepage">
-                <span class="brand-icon">🧥</span>
+            <a href="<?php echo $basePath; ?>views/public/home.php" class="brand-logo" aria-label="ThriftedGH home">
+                <span class="brand-icon"><?php echo tgh_icon('shirt'); ?></span>
                 <span class="brand-name">Thrifted<span class="brand-gh">GH</span></span>
-                <span class="brand-tagline">Thrift • Renew • Style</span>
             </a>
 
-            <!-- Mobile Hamburger Button -->
             <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Toggle navigation menu" aria-expanded="false">
                 <span class="bar"></span>
                 <span class="bar"></span>
                 <span class="bar"></span>
             </button>
 
-            <!-- Navigation Links -->
             <nav class="main-nav" id="mainNav">
                 <ul class="nav-list">
-                    <li class="nav-item">
-                        <a href="<?php echo $basePath; ?>index.php?page=home" 
-                           class="nav-link <?php echo ($activeNav === 'home') ? 'active' : ''; ?>">
-                           Home
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="<?php echo $basePath; ?>index.php?page=shop" 
-                           class="nav-link <?php echo ($activeNav === 'shop') ? 'active' : ''; ?>">
-                           Shop
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="<?php echo $basePath; ?>index.php?page=sellers" 
-                           class="nav-link <?php echo ($activeNav === 'sellers') ? 'active' : ''; ?>">
-                           Sellers
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="<?php echo $basePath; ?>views/find_my_fit.php"
-                           class="nav-link <?php echo ($activeNav === 'find_my_fit') ? 'active' : ''; ?>">
-                           Find My Fit
-                        </a>
-                    </li>
-                    <?php if ($navLoggedIn): ?>
-                    <li class="nav-item">
-                        <a href="<?php echo $basePath; ?>views/buyer/dashboard.php"
-                           class="nav-link <?php echo ($activeNav === 'account') ? 'active' : ''; ?>">
-                           Account
-                        </a>
-                    </li>
-                    <li class="nav-item"><a class="nav-link" href="<?php echo $basePath; ?>index.php?page=orders">Orders</a></li>
-                    <li class="nav-item">
-                        <a href="<?php echo $basePath; ?>logout.php" class="nav-link nav-register-btn">
-                           Logout
-                        </a>
-                    </li>
-                    <?php else: ?>
-                    <li class="nav-item">
-                        <a href="<?php echo $basePath; ?>index.php?page=login" 
-                           class="nav-link <?php echo ($activeNav === 'login') ? 'active' : ''; ?>">
-                           Login
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="<?php echo $basePath; ?>index.php?page=register" 
-                           class="nav-link nav-register-btn <?php echo ($activeNav === 'register') ? 'active' : ''; ?>">
-                           Register
-                        </a>
-                    </li>
-                    <?php endif; ?>
-                    <li class="nav-item">
-                        <a href="<?php echo $basePath; ?>index.php?page=cart" 
-                           class="nav-link nav-cart-link <?php echo ($activeNav === 'cart') ? 'active' : ''; ?>"
-                           aria-label="Shopping Cart">
-                           <span class="cart-icon">🛒</span> Cart
-                        </a>
-                    </li>
+                    <?php
+                    echo tgh_nav_link('views/public/home.php', 'Home', 'home', $activeNav);
+                    echo tgh_nav_link('views/public/shop.php', 'Shop', 'shop', $activeNav);
+                    echo tgh_nav_link('views/public/sellers.php', 'Sellers', 'sellers', $activeNav);
+                    echo tgh_nav_link('views/buyer/find_my_fit.php', 'Find My Fit', 'find_my_fit', $activeNav);
+                    if ($navLoggedIn) {
+                        echo tgh_nav_link('views/buyer/dashboard.php', 'Account', 'dashboard', $activeNav);
+                        echo tgh_nav_link('views/buyer/orders.php', 'Orders', 'orders', $activeNav);
+                        if ($navRole === 'seller') {
+                            echo tgh_nav_link('views/seller/dashboard.php', 'Seller', 'seller', $activeNav);
+                        }
+                        if ($navRole === 'admin') {
+                            echo tgh_nav_link('views/admin/dashboard.php', 'Admin', 'admin', $activeNav);
+                        }
+                        echo '<li class="nav-item"><a class="nav-link nav-register-btn" href="' . htmlspecialchars(tgh_url('actions/auth/logout.php'), ENT_QUOTES, 'UTF-8') . '">Logout</a></li>';
+                    } else {
+                        echo tgh_nav_link('views/auth/login.php', 'Login', 'login', $activeNav);
+                        echo tgh_nav_link('views/auth/register.php', 'Register', 'register', $activeNav, 'nav-register-btn');
+                    }
+                    echo tgh_nav_link('views/buyer/cart.php', tgh_icon('cart', 'cart-icon') . ' Cart', 'cart', $activeNav, 'nav-cart-link');
+                    ?>
                 </ul>
             </nav>
         </div>
     </header>
 
-    <!-- Main Content Area Starts -->
     <main class="main-content">

@@ -4,7 +4,6 @@ class OrderClass extends CommerceModel {
     public function create($userId, $address) {
         if (!is_string($address) || strlen(trim($address)) < 10 || strlen($address)>2000) throw new DomainException('Enter a delivery address between 10 and 2,000 characters.');
         return $this->transaction(function () use ($userId,$address) {
-            // Serialise duplicate checkout submissions for this account.
             $this->fetchOne('SELECT user_id FROM users WHERE user_id=? FOR UPDATE','i',[$userId]);
             $pending=$this->fetchOne("SELECT order_reference FROM orders WHERE buyer_id=? AND payment_status='pending' AND reservation_expires_at>UTC_TIMESTAMP() LIMIT 1",'i',[$userId]);
             if ($pending) throw new DomainException('You already have a pending checkout. View your orders to check its payment status.');
@@ -65,7 +64,6 @@ class OrderClass extends CommerceModel {
             foreach ($items as $p) $owned=$owned && $p['status']==='reserved' && (int)$p['reservation_order_id']===(int)$o['order_id'];
             $this->write("UPDATE payments SET status='success',verified_at=UTC_TIMESTAMP() WHERE order_id=?",'i',[$o['order_id']]);
             if (!$owned) {
-                // A late charge must never take inventory belonging to another checkout.
                 $this->write('UPDATE orders SET payment_review=1 WHERE order_id=?','i',[$o['order_id']]);
                 return $this->byReference($ref);
             }

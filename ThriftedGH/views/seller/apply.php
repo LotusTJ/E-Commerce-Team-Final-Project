@@ -1,15 +1,16 @@
 <?php
-$root = '../../';
-
+require_once __DIR__ . '/../../core/guard.php';
 require_once __DIR__ . '/../../controllers/Seller.php';
 
-tgh_require_login($root . 'index.php?page=login');
+$user = guardRequireLogin();
+if ($user['role'] === 'admin') {
+    guardDeny(403, 'Administrator accounts cannot apply to sell.');
+}
 
-$userId = tgh_current_user_id();
-$application = application_status_ctr($userId);
+$application = application_status_ctr($user['user_id']);
 
 if ($application && $application['status'] === 'approved') {
-    tgh_redirect('../seller_dashboard.php');
+    tgh_redirect(tgh_url('views/seller/dashboard.php'));
 }
 
 $old = tgh_old_input_take();
@@ -18,20 +19,23 @@ $values = array_merge(
     $old
 );
 
-tgh_layout_start('Become a seller', $root, 'sellers');
+tgh_layout_start('Become a seller', 'sellers');
 tgh_render_flash();
 ?>
 <section class="m3-head">
     <h1>Become a seller</h1>
-    <p class="m3-muted">Apply with your existing account. An administrator reviews every application before you can publish.</p>
+    <p class="m3-muted">Apply with your existing account. An administrator reviews every application and its documents before you can publish.</p>
 </section>
 
 <?php if ($application && $application['status'] === 'pending'): ?>
     <div class="m3-panel">
         <h2>Your application is being reviewed</h2>
         <p><strong><?= tgh_e($application['shop_name']) ?></strong> (<?= tgh_e(SellerClass::TYPES[$application['seller_type']] ?? '') ?>) was submitted on <?= tgh_e(date('j M Y', strtotime($application['created_at']))) ?>.</p>
-        <p class="m3-muted">You will be able to publish products as soon as it is approved.</p>
-        <p><a class="m3-btn m3-btn-ghost" href="../buyer/dashboard.php">Back to my account</a></p>
+        <p class="m3-muted">You can publish products as soon as it is approved.</p>
+        <p>
+            <a class="m3-btn" href="<?= tgh_e(tgh_url('views/seller/documents.php')) ?>">Manage verification documents</a>
+            <a class="m3-btn m3-btn-ghost" href="<?= tgh_e(tgh_url('views/buyer/dashboard.php')) ?>">Back to my account</a>
+        </p>
     </div>
 <?php else: ?>
     <?php if ($application && $application['status'] === 'rejected'): ?>
@@ -40,7 +44,7 @@ tgh_render_flash();
         </div>
     <?php endif; ?>
 
-    <form class="m3-form" method="post" action="<?= tgh_e($root) ?>actions/seller_application.php">
+    <form class="m3-form" method="post" action="<?= tgh_e(tgh_url('actions/seller/apply.php')) ?>">
         <?= tgh_csrf_field() ?>
 
         <label for="seller_type">Seller type</label>
@@ -69,6 +73,7 @@ tgh_render_flash();
         <textarea id="business_details" name="business_details" rows="5" minlength="10" maxlength="1000" required><?= tgh_e($values['business_details']) ?></textarea>
         <p class="m3-hint">What do you sell, and where do your pieces come from?</p>
 
+        <p class="m3-hint">After you submit, you will be asked to upload a student ID, national ID or business registration.</p>
         <button class="m3-btn" type="submit">Submit application</button>
     </form>
 <?php endif; ?>
