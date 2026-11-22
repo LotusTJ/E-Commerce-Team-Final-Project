@@ -45,12 +45,13 @@ $titles=['buyer'=>'Your orders','seller'=>'Orders for your shop','admin'=>'Order
 <?php foreach($items as $item): ?>
 <div class="tg-line tg-line-receipt"><img class="tg-thumb" src="<?=tg_img($basePath,$item['image_path']??'')?>" alt=""><div class="tg-line-body"><h3><?=tgh_e($item['title_at_purchase']??('Product #'.$item['product_id']))?></h3><p class="tg-meta">Sold by <?=tgh_e($item['shop_name'])?></p><?php if($paid): ?><span class="tg-pill tg-pill-<?=tgh_e($item['fulfilment_status'])?>"><?=tgh_e(tg_fulfilment_label($item['fulfilment_status']))?></span><?php endif; ?></div><div class="tg-price"><?=tgh_e(tgh_format_price($item['price_at_purchase']))?></div></div>
 <?php endforeach; ?>
-<dl class="tg-rows tg-rows-receipt"><div><dt>Subtotal</dt><dd><?=tgh_e(tgh_format_price($detail['total_amount']))?></dd></div><div><dt>Delivery</dt><dd>None added</dd></div></dl>
+<?php $itemsCents=0; $sellerCents=0; foreach($items as $it){ $itemsCents+=CommerceModel::cents($it['price_at_purchase']); $sellerCents+=CommerceModel::cents($it['commission_amount']); } $feeCents=CommerceModel::cents($detail['total_amount'])-$itemsCents; ?>
+<dl class="tg-rows tg-rows-receipt"><div><dt>Items subtotal</dt><dd><?=tgh_e(tgh_format_price(CommerceModel::money($itemsCents)))?></dd></div><?php if($feeCents>0): ?><div><dt>Service fee (3%, paid by buyer)</dt><dd><?=tgh_e(tgh_format_price(CommerceModel::money($feeCents)))?></dd></div><?php endif; ?><div><dt>Delivery</dt><dd>None added</dd></div><?php if($scope==='admin' && $paid): ?><div><dt>Seller commission (7%, taken from seller)</dt><dd><?=tgh_e(tgh_format_price(CommerceModel::money($sellerCents)))?></dd></div><div><dt>Marketplace income (3% + 7%)</dt><dd><?=tgh_e(tgh_format_price(CommerceModel::money($feeCents+$sellerCents)))?></dd></div><?php endif; ?></dl>
 <div class="tg-total"><span><?=$paid?'Total paid':'Total'?></span><strong><?=tgh_e(tgh_format_price($detail['total_amount']))?></strong></div>
 <div class="tg-two"><div><h2 class="tg-section-h">Deliver to</h2><p class="tg-address"><?=nl2br(tgh_e($detail['delivery_address']))?></p></div>
 <div><h2 class="tg-section-h">Payment</h2><p class="tg-address">Paystack · GHS<br><?=$paid?'Verified by Paystack':($pending?'Awaiting confirmation':'Not completed')?></p></div></div>
 </div>
-<footer class="tg-receipt-foot">Thank you for buying second-hand.</footer>
+<footer class="tg-receipt-foot">ThriftedGH takes a 10% commission on each sale: 3% is added to the buyer's total and 7% is taken from the seller. Thank you for buying second-hand.</footer>
 </article>
 
 <div class="tg-actions tg-noprint">
@@ -70,7 +71,7 @@ $titles=['buyer'=>'Your orders','seller'=>'Orders for your shop','admin'=>'Order
 <div class="tg-card tg-sale-item">
 <div class="tg-line tg-line-receipt"><img class="tg-thumb" src="<?=tg_img($basePath,$item['image_path']??'')?>" alt=""><div class="tg-line-body"><h3><?=tgh_e($item['title_at_purchase']??('Product #'.$item['product_id']))?></h3><p class="tg-meta"><?=tgh_e($item['shop_name'])?></p><span class="tg-pill tg-pill-<?=tgh_e($item['fulfilment_status'])?>"><?=tgh_e(tg_fulfilment_label($item['fulfilment_status']))?></span></div><div class="tg-price"><?=tgh_e(tgh_format_price($item['price_at_purchase']))?></div></div>
 <?php tg_timeline(['Paid','Preparing','Shipped','Delivered'],1+$rank); ?>
-<dl class="tg-rows"><div><dt>Sale price</dt><dd><?=tgh_e(tgh_format_price($item['price_at_purchase']))?></dd></div><div><dt>Marketplace commission</dt><dd>− <?=tgh_e(tgh_format_price($item['commission_amount']))?></dd></div></dl>
+<dl class="tg-rows"><div><dt>Sale price</dt><dd><?=tgh_e(tgh_format_price($item['price_at_purchase']))?></dd></div><div><dt>Marketplace commission (7%)</dt><dd>− <?=tgh_e(tgh_format_price($item['commission_amount']))?></dd></div></dl>
 <div class="tg-total"><span>You earn</span><strong><?=tgh_e(tgh_format_price(CommerceModel::money($sellerNet)))?></strong></div>
 <?php if($scope==='seller' && $next): ?><form method="post" action="<?=tgh_e(tgh_url('actions/fulfil_order_action.php'))?>" class="tg-actions"><?=tgh_csrf_field()?><input type="hidden" name="item_id" value="<?=(int)$item['order_item_id']?>"><button class="btn btn-primary" name="status" value="<?=tgh_e($next)?>" data-busy="Updating…">Mark as <?=tgh_e(['processing'=>'being prepared','shipped'=>'shipped','delivered'=>'delivered'][$next])?></button></form><?php endif; ?>
 </div>

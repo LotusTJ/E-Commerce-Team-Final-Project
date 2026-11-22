@@ -30,12 +30,12 @@ $sellerCount=count(array_unique(array_column($items,'seller_id')));
 <?php endforeach; ?>
 </div>
 <aside class="tg-card tg-summary"><h2>Order summary</h2>
-<dl class="tg-rows"><div><dt>Subtotal (<?=count($items)?> <?=count($items)===1?'piece':'pieces'?>)</dt><dd>GH₵ <?=CommerceModel::money($total)?></dd></div><div><dt>Delivery fee</dt><dd>None added</dd></div></dl>
-<div class="tg-total"><span>Total</span><strong>GH₵ <?=CommerceModel::money($total)?></strong></div>
+<?php $fee=CommerceModel::buyerFee($total); $grand=$total+$fee; ?>
+<dl class="tg-rows"><div><dt>Subtotal (<?=count($items)?> <?=count($items)===1?'piece':'pieces'?>)</dt><dd>GH₵ <?=CommerceModel::money($total)?></dd></div><div><dt>Service fee (3%)</dt><dd>GH₵ <?=CommerceModel::money($fee)?></dd></div><div><dt>Delivery fee</dt><dd>None added</dd></div></dl>
+<div class="tg-total"><span>Total</span><strong>GH₵ <?=CommerceModel::money($grand)?></strong></div>
 <?php if(!$unavailable): ?><a class="btn btn-primary tg-block" href="<?=tgh_e($basePath)?>views/buyer/checkout.php">Continue to checkout</a>
 <?php else: ?><div class="tg-note tg-note-warn">Remove the unavailable pieces to continue.</div><?php endif; ?>
 <a class="tg-link-center" href="<?=tgh_e($basePath)?>views/public/shop.php">Keep browsing</a>
-<ul class="tg-ticks"><li>Pieces are only held once you start payment</li><li>Secure payment by Paystack</li><li>The seller ships after your payment is confirmed</li></ul>
 </aside>
 </div>
 <?php endif; ?>

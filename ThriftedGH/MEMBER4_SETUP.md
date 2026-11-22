@@ -85,7 +85,7 @@ Fresh installation and an additive upgrade of the original main schema were both
 1. Use two separate approved sellers and one buyer. Upload one legitimate test product per seller through Task 5.
 2. Add both to one cart; repeat an add to confirm quantity stays one. Confirm seller names, images and total.
 3. Complete one genuine Paystack TEST payment using Paystack's current documented test instruments.
-4. Check the callback AND public webhook delivery. Replay a notification. There must be exactly one paid order, one earnings row per item, correct 10% commission and no duplicate deductions.
+4. Check the callback AND public webhook delivery. Replay a notification. There must be exactly one paid order, one earnings row per item, correct 3% buyer fee and 7% seller commission and no duplicate deductions.
 5. Verify both products disappear from Home, Shop, search and storefronts. Verify buyer history and each seller's isolated order items.
 6. Progress one seller's item to delivered and confirm the admin view distinguishes verified sales from delivered sales.
 7. Test a failed payment and an abandoned/expired reservation with the worker enabled. Verify stock returns without earnings. Test a late notification and confirm it enters review without double-selling.

@@ -32,9 +32,10 @@ $pageTitle='Checkout | ThriftedGH';$activeNav='cart';require __DIR__.'/../layout
 </div>
 </div>
 <aside class="tg-card tg-summary"><h2>Order summary</h2>
-<dl class="tg-rows"><div><dt>Subtotal (<?=count($items)?> <?=count($items)===1?'piece':'pieces'?>)</dt><dd>GH₵ <?=CommerceModel::money($total)?></dd></div><div><dt>Delivery fee</dt><dd>None added</dd></div></dl>
-<div class="tg-total"><span>Total</span><strong>GH₵ <?=CommerceModel::money($total)?></strong></div>
-<button class="btn btn-primary tg-block tg-pay" type="submit" id="payBtn" data-label="Pay GH₵ <?=CommerceModel::money($total)?> with Paystack">Pay GH₵ <?=CommerceModel::money($total)?> with Paystack</button>
+<?php $fee=CommerceModel::buyerFee($total); $grand=$total+$fee; ?>
+<dl class="tg-rows"><div><dt>Subtotal (<?=count($items)?> <?=count($items)===1?'piece':'pieces'?>)</dt><dd>GH₵ <?=CommerceModel::money($total)?></dd></div><div><dt>Service fee (3%)</dt><dd>GH₵ <?=CommerceModel::money($fee)?></dd></div><div><dt>Delivery fee</dt><dd>None added</dd></div></dl>
+<div class="tg-total"><span>Total</span><strong>GH₵ <?=CommerceModel::money($grand)?></strong></div>
+<button class="btn btn-primary tg-block tg-pay" type="submit" id="payBtn" data-label="Pay GH₵ <?=CommerceModel::money($grand)?> with Paystack">Pay GH₵ <?=CommerceModel::money($grand)?> with Paystack</button>
 <p class="tg-fine">Your pieces are held for 15 minutes once you start payment. Changed your mind? You can cancel from your orders page.</p>
 <div class="tg-secure"><?=tgh_icon('lock')?> Payments secured by Paystack</div>
 </aside>

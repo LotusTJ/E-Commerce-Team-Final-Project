@@ -12,17 +12,18 @@ class OrderClass extends CommerceModel {
                 JOIN seller_profiles sp ON sp.seller_id=p.seller_id
                 WHERE c.user_id=? ORDER BY p.product_id FOR UPDATE",'i',[$userId]);
             if (!$items) throw new DomainException('Your cart is empty.');
-            $total=0;
+            $subtotal=0;
             foreach ($items as $p) {
                 $approved=$this->fetchOne("SELECT application_id FROM seller_applications WHERE user_id=? AND status='approved' LIMIT 1",'i',[$p['seller_user_id']]);
                 if (!$approved || $p['status']!=='available' || (int)$p['stock_quantity']!==1) throw new DomainException('An item is unavailable. Remove it from your cart and try again.');
-                $total+=self::cents($p['price']);
+                $subtotal+=self::cents($p['price']);
             }
+            $total=$subtotal+self::buyerFee($subtotal);
             if ($total<1 || $total>9999999999) throw new DomainException('The order total must be greater than zero and within the payment limit.');
             $ref='TGH-'.bin2hex(random_bytes(16));
             $id=$this->write("INSERT INTO orders (buyer_id,order_reference,total_amount,delivery_address,reservation_expires_at) VALUES (?,?,?,?,DATE_ADD(UTC_TIMESTAMP(),INTERVAL 15 MINUTE))",'isss',[$userId,$ref,self::money($total),trim($address)])['id'];
             foreach ($items as $p) {
-                $commission=intdiv(self::cents($p['price'])+5,10);
+                $commission=self::sellerFee(self::cents($p['price']));
                 $this->write('INSERT INTO order_items (order_id,product_id,seller_id,price_at_purchase,commission_amount,title_at_purchase) VALUES (?,?,?,?,?,?)','iiisss',[$id,$p['product_id'],$p['seller_id'],$p['price'],self::money($commission),$p['title']]);
                 $this->write("UPDATE products SET status='reserved',reservation_order_id=? WHERE product_id=?",'ii',[$id,$p['product_id']]);
             }

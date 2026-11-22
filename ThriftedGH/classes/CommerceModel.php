@@ -16,4 +16,6 @@ abstract class CommerceModel {
         return (int)$parts[0] * 100 + (int)str_pad($parts[1] ?? '', 2, '0');
     }
     public static function money($cents) { return sprintf('%d.%02d', intdiv($cents, 100), $cents % 100); }
+    public static function buyerFee($cents) { return intdiv($cents * 3 + 50, 100); }
+    public static function sellerFee($cents) { return intdiv($cents * 7 + 50, 100); }
 }
