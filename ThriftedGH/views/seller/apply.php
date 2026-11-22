@@ -44,7 +44,7 @@ tgh_render_flash();
         </div>
     <?php endif; ?>
 
-    <form class="m3-form" method="post" action="<?= tgh_e(tgh_url('actions/seller/apply.php')) ?>">
+    <form class="m3-form" method="post" action="<?= tgh_e(tgh_url('actions/apply_seller_action.php')) ?>">
         <?= tgh_csrf_field() ?>
 
         <label for="seller_type">Seller type</label>

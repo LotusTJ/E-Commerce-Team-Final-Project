@@ -27,7 +27,7 @@ ob_start();
 $login = [
     'title' => 'Welcome back',
     'subtitle' => 'Sign in to shop, check out and track your orders.',
-    'action' => 'actions/auth/login.php',
+    'action' => 'actions/login_action.php',
     'button' => 'Sign in',
     'footer' => ob_get_clean(),
 ];

@@ -28,7 +28,7 @@ $pageTitle='Payment result | ThriftedGH';$activeNav='orders';require __DIR__.'/.
 <?php if($state==='paid'): ?><ul class="tg-ticks tg-ticks-inline"><li>Paid <?=tgh_e(tg_when($o['paid_at']??$o['created_at']))?></li><li>Seller notified</li><li>Track delivery in your receipt</li></ul><?php endif; ?>
 </div>
 <div class="tg-actions tg-actions-center">
-<?php if($state==='pending'): ?><form method="post" action="<?=tgh_e(tgh_url('actions/orders/verify.php'))?>"><?=tgh_csrf_field()?><input type="hidden" name="reference" value="<?=tgh_e($o['order_reference'])?>"><button class="btn btn-primary" data-busy="Checking…">Check payment status</button></form><?php endif; ?>
+<?php if($state==='pending'): ?><form method="post" action="<?=tgh_e(tgh_url('actions/verify_order_action.php'))?>"><?=tgh_csrf_field()?><input type="hidden" name="reference" value="<?=tgh_e($o['order_reference'])?>"><button class="btn btn-primary" data-busy="Checking…">Check payment status</button></form><?php endif; ?>
 <a class="btn <?=$state==='pending'?'btn-outline':'btn-primary'?>" href="<?=tgh_e($basePath)?>views/buyer/orders.php?id=<?=(int)$o['order_id']?>"><?=$state==='paid'?'View full receipt':'View order'?></a>
 <?php if($state==='failed'): ?><a class="btn btn-primary" href="<?=tgh_e($basePath)?>views/buyer/cart.php">Back to cart</a><?php endif; ?>
 <a class="btn btn-outline" href="<?=tgh_e($basePath)?>views/public/shop.php">Keep shopping</a>

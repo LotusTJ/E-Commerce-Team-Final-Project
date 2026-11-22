@@ -26,7 +26,7 @@ ob_start();
 $login = [
     'title' => 'Seller sign in',
     'subtitle' => 'Manage your shop and fulfil your orders.',
-    'action' => 'actions/auth/seller_login.php',
+    'action' => 'actions/seller_login_action.php',
     'button' => 'Sign in to my shop',
     'footer' => ob_get_clean(),
 ];

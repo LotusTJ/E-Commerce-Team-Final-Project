@@ -26,7 +26,7 @@ tgh_render_flash();
 </section>
 
 <?php if ($open): ?>
-    <form class="m3-form" method="post" enctype="multipart/form-data" action="<?= tgh_e(tgh_url('actions/documents/upload.php')) ?>">
+    <form class="m3-form" method="post" enctype="multipart/form-data" action="<?= tgh_e(tgh_url('actions/upload_document_action.php')) ?>">
         <?= tgh_csrf_field() ?>
         <input type="hidden" name="MAX_FILE_SIZE" value="<?= (int)DOCUMENT_MAX_BYTES ?>">
 
@@ -67,9 +67,9 @@ tgh_render_flash();
                         </div>
                     </div>
                     <div class="m3-row-actions">
-                        <a class="m3-btn m3-btn-small m3-btn-ghost" href="<?= tgh_e(tgh_url('actions/documents/download.php')) ?>?id=<?= (int)$document['document_id'] ?>"><?= tgh_icon('download') ?> Download</a>
+                        <a class="m3-btn m3-btn-small m3-btn-ghost" href="<?= tgh_e(tgh_url('actions/download_document_action.php')) ?>?id=<?= (int)$document['document_id'] ?>"><?= tgh_icon('download') ?> Download</a>
                         <?php if ($open): ?>
-                            <form method="post" action="<?= tgh_e(tgh_url('actions/documents/delete.php')) ?>" class="js-confirm" data-message="Delete this document?">
+                            <form method="post" action="<?= tgh_e(tgh_url('actions/delete_document_action.php')) ?>" class="js-confirm" data-message="Delete this document?">
                                 <?= tgh_csrf_field() ?>
                                 <input type="hidden" name="document_id" value="<?= (int)$document['document_id'] ?>">
                                 <button type="submit" class="m3-btn m3-btn-small m3-btn-danger"><?= tgh_icon('trash') ?> Delete</button>

@@ -45,5 +45,5 @@ tgh_render_flash();
     <?php endif; ?>
 </div>
 
-<p><a class="m3-btn m3-btn-ghost" href="<?= tgh_e(tgh_url('actions/auth/logout.php')) ?>">Sign out</a></p>
+<p><a class="m3-btn m3-btn-ghost" href="<?= tgh_e(tgh_url('actions/logout_action.php')) ?>">Sign out</a></p>
 <?php tgh_layout_end(); ?>

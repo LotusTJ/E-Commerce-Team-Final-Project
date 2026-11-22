@@ -64,7 +64,7 @@ tgh_render_flash();
 <div id="form-errors" class="m3-alert m3-alert-error" role="alert" hidden></div>
 
 <form id="product-form" class="m3-form" method="post" enctype="multipart/form-data" novalidate
-      action="<?= tgh_e(tgh_url($editing ? 'actions/products/update.php' : 'actions/products/create.php')) ?>">
+      action="<?= tgh_e(tgh_url($editing ? 'actions/update_product_action.php' : 'actions/add_product_action.php')) ?>">
     <?= tgh_csrf_field() ?>
     <?php if ($editing): ?>
         <input type="hidden" name="product_id" value="<?= (int)$productId ?>">

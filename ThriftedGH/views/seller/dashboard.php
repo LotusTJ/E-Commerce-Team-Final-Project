@@ -55,7 +55,7 @@ tgh_render_flash();
                     <?php if ($product['status'] === 'available'): ?>
                         <div class="m3-row-actions">
                             <a class="m3-btn m3-btn-small" href="<?= tgh_e(tgh_url('views/seller/product_form.php')) ?>?id=<?= (int)$product['product_id'] ?>">Edit</a>
-                            <form method="post" action="<?= tgh_e(tgh_url('actions/products/delete.php')) ?>" class="js-confirm" data-message="Remove this listing?">
+                            <form method="post" action="<?= tgh_e(tgh_url('actions/delete_product_action.php')) ?>" class="js-confirm" data-message="Remove this listing?">
                                 <?= tgh_csrf_field() ?>
                                 <input type="hidden" name="product_id" value="<?= (int)$product['product_id'] ?>">
                                 <button type="submit" class="m3-btn m3-btn-small m3-btn-danger">Remove</button>

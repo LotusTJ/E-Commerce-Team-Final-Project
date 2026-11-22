@@ -12,7 +12,7 @@ $pageTitle='Checkout | ThriftedGH';$activeNav='cart';require __DIR__.'/../layout
 <div class="tg-card tg-empty"><div class="tg-empty-icon"><?=tgh_icon('basket')?></div><h2>Nothing to check out yet</h2><p>Your cart is empty or has a piece that is no longer available.</p><a class="btn btn-primary" href="<?=tgh_e($basePath)?>views/buyer/cart.php">Back to cart</a></div>
 <?php else: ?>
 <p class="tg-sub">One last step. Tell us where to deliver, then pay securely with Paystack.</p>
-<form method="post" action="<?=tgh_e(tgh_url('actions/checkout/start.php'))?>" id="checkoutForm" class="tg-grid">
+<form method="post" action="<?=tgh_e(tgh_url('actions/start_checkout_action.php'))?>" id="checkoutForm" class="tg-grid">
 <?=tgh_csrf_field()?>
 <div class="tg-stack">
 <div class="tg-card tg-field"><h2><span class="tg-num">1</span> Delivery address</h2>

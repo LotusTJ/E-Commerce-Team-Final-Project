@@ -25,7 +25,7 @@ ThriftedGH follows the MVC pattern. Every page is its own file, every form posts
 Adding a piece to the cart:
 
 1. The buyer clicks "Add to cart" on `views/public/shop.php`. The product card is drawn by `views/components/product_card.php`.
-2. The button submits a form to `actions/cart/add.php`.
+2. The button submits a form to `actions/add_to_cart_action.php`.
 3. The action loads `controllers/Cart.php`, which loads `core/guard.php`. The guard checks the form is a POST, the CSRF token is valid, and the user is logged in.
 4. The action calls `CartClass->add()` in `classes/CartClass.php`, which writes to the `cart_items` table.
 5. The action sets a flash message and redirects to `views/buyer/cart.php`, which asks `CartClass` for the items and draws the page inside `views/layout/header.php` and `footer.php`.
@@ -38,7 +38,7 @@ Every action follows the same shape: guard, validate, call the model, flash mess
 - Pages and actions call `core/guard.php` first. Nothing else decides who may enter.
 - `controllers/*` call `classes/*`. Only `classes/*` and `core/db_class.php` touch MySQL.
 - `core/helpers.php` provides `tgh_url()`, `tgh_e()`, flash messages and CSRF to everyone.
-- `actions/checkout/start.php` calls `payments/PaystackService.php` to start a payment. Paystack sends the buyer to `payments/callback.php`, which verifies the payment with Paystack and redirects to `views/buyer/payment_result.php`.
+- `actions/start_checkout_action.php` calls `payments/PaystackService.php` to start a payment. Paystack sends the buyer to `payments/callback.php`, which verifies the payment with Paystack and redirects to `views/buyer/payment_result.php`.
 
 ## Access rules
 
@@ -51,9 +51,9 @@ Every action follows the same shape: guard, validate, call the model, flash mess
 
 Each kind of user has its own login page and its own action file. They share one check in `controllers/Login.php`.
 
-- Buyers: `views/auth/login.php` posts to `actions/auth/login.php`. Lands on the home page.
-- Sellers: `views/auth/seller_login.php` posts to `actions/auth/seller_login.php`. Lands on the seller dashboard.
-- Admins: `views/auth/admin_login.php` posts to `actions/auth/admin_login.php`. Lands on the admin dashboard.
+- Buyers: `views/auth/login.php` posts to `actions/login_action.php`. Lands on the home page.
+- Sellers: `views/auth/seller_login.php` posts to `actions/seller_login_action.php`. Lands on the seller dashboard.
+- Admins: `views/auth/admin_login.php` posts to `actions/admin_login_action.php`. Lands on the admin dashboard.
 
 The right account type is required on each page. A seller cannot log in on the buyer page and a buyer cannot log in on the seller page. The admin login is not linked from any page, menu or footer, is marked noindex, and shows a plain "do not match" message to anyone who is not an admin, so it never confirms that an account is an admin. Admin accounts are created in the database (`database/admin_seed.sql`), never through registration.
 
@@ -63,9 +63,9 @@ The menu depends on the role. Sellers see Dashboard, Add a piece, Sales and Logo
 
 Applicants upload verification documents (student ID, national ID, business registration) at `views/seller/documents.php`.
 
-- `actions/documents/upload.php` checks the file type from its real contents (PDF, JPG, PNG only), a 5 MB limit, five files per application, and the CSRF token.
+- `actions/upload_document_action.php` checks the file type from its real contents (PDF, JPG, PNG only), a 5 MB limit, five files per application, and the CSRF token.
 - Files are saved under random names in `thriftedgh_storage/documents`, a folder next to the project folder and outside the web root. Set `DOC_STORAGE_DIR` to choose another private folder.
-- `actions/documents/download.php` is the only way to read a file. It allows the owner and admins and nobody else.
+- `actions/download_document_action.php` is the only way to read a file. It allows the owner and admins and nobody else.
 - Admins see each applicant's documents on `views/admin/applications.php` before approving.
 - The database table is `seller_documents` (`database/migrations/009_documents.sql`).
 

@@ -1,6 +1,6 @@
 <?php
-require_once __DIR__ . '/../../core/guard.php';
-require_once __DIR__ . '/../../controllers/Fit.php';
+require_once __DIR__ . '/../core/guard.php';
+require_once __DIR__ . '/../controllers/Fit.php';
 
 $fitPage = tgh_url('views/buyer/find_my_fit.php');
 

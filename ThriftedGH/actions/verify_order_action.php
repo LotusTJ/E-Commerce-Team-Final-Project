@@ -1,5 +1,5 @@
 <?php
-require_once __DIR__ . '/../../controllers/Order.php';
+require_once __DIR__ . '/../controllers/Order.php';
 
 $ordersPage = tgh_url('views/buyer/orders.php');
 

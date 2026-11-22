@@ -79,7 +79,7 @@ if (!function_exists('tgh_nav_link')) {
             <nav class="main-nav" id="mainNav">
                 <ul class="nav-list">
                     <?php
-                    $logout = '<li class="nav-item"><a class="nav-link nav-register-btn" href="' . htmlspecialchars(tgh_url('actions/auth/logout.php'), ENT_QUOTES, 'UTF-8') . '">Sign out</a></li>';
+                    $logout = '<li class="nav-item"><a class="nav-link nav-register-btn" href="' . htmlspecialchars(tgh_url('actions/logout_action.php'), ENT_QUOTES, 'UTF-8') . '">Sign out</a></li>';
                     if ($navMode === 'seller') {
                         echo tgh_nav_link('views/seller/dashboard.php', 'Dashboard', 'seller', $activeNav);
                         echo tgh_nav_link('views/seller/product_form.php', 'List an item', 'seller_add', $activeNav);

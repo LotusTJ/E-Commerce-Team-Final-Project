@@ -1,6 +1,6 @@
 <?php
-require_once __DIR__ . '/../../core/guard.php';
-require_once __DIR__ . '/../../classes/UserClass.php';
+require_once __DIR__ . '/../core/guard.php';
+require_once __DIR__ . '/../classes/UserClass.php';
 
 $registerPage = tgh_url('views/auth/register.php');
 

@@ -25,7 +25,7 @@ $sellerCount=count(array_unique(array_column($items,'seller_id')));
 <div class="tg-line-body"><h3><?=tgh_e($item['title'])?></h3><p class="tg-meta">Size <?=tgh_e($item['size']?:'not specified')?> · <?=tgh_e(str_replace('_',' ',$item['item_condition']))?></p><p class="tg-meta">Sold by <?=tgh_e($item['seller_name'])?></p>
 <?php if(!$item['purchasable']): ?><p class="tg-flag" role="alert">No longer available. Remove it to continue.</p><?php endif; ?></div>
 <div class="tg-price"><?=tgh_e(tgh_format_price($item['price']))?></div>
-<form method="post" action="<?=tgh_e(tgh_url('actions/cart/remove.php'))?>"><?=tgh_csrf_field()?><input type="hidden" name="product_id" value="<?=(int)$item['product_id']?>"><button class="tg-icon-btn" type="submit" aria-label="Remove <?=tgh_e($item['title'])?> from cart" title="Remove"><?=tgh_icon('x')?></button></form>
+<form method="post" action="<?=tgh_e(tgh_url('actions/remove_from_cart_action.php'))?>"><?=tgh_csrf_field()?><input type="hidden" name="product_id" value="<?=(int)$item['product_id']?>"><button class="tg-icon-btn" type="submit" aria-label="Remove <?=tgh_e($item['title'])?> from cart" title="Remove"><?=tgh_icon('x')?></button></form>
 </article>
 <?php endforeach; ?>
 </div>

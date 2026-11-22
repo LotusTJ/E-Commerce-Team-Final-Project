@@ -40,7 +40,7 @@ tgh_render_flash();
                                 <?php foreach ($files as $file): ?>
                                     <li>
                                         <?= tgh_icon('file') ?>
-                                        <a href="<?= tgh_e(tgh_url('actions/documents/download.php')) ?>?id=<?= (int)$file['document_id'] ?>"><?= tgh_e($file['original_name']) ?></a>
+                                        <a href="<?= tgh_e(tgh_url('actions/download_document_action.php')) ?>?id=<?= (int)$file['document_id'] ?>"><?= tgh_e($file['original_name']) ?></a>
                                         <span class="m3-muted"><?= tgh_e(DocumentClass::TYPES[$file['doc_type']] ?? '') ?></span>
                                     </li>
                                 <?php endforeach; ?>
@@ -49,13 +49,13 @@ tgh_render_flash();
                     </div>
                 </div>
                 <div class="m3-row-actions">
-                    <form method="post" action="<?= tgh_e(tgh_url('actions/admin/review_application.php')) ?>">
+                    <form method="post" action="<?= tgh_e(tgh_url('actions/review_application_action.php')) ?>">
                         <?= tgh_csrf_field() ?>
                         <input type="hidden" name="application_id" value="<?= (int)$application['application_id'] ?>">
                         <input type="hidden" name="decision" value="approve">
                         <button class="m3-btn m3-btn-small" type="submit">Approve</button>
                     </form>
-                    <form method="post" action="<?= tgh_e(tgh_url('actions/admin/review_application.php')) ?>" class="js-confirm" data-message="Reject this application?">
+                    <form method="post" action="<?= tgh_e(tgh_url('actions/review_application_action.php')) ?>" class="js-confirm" data-message="Reject this application?">
                         <?= tgh_csrf_field() ?>
                         <input type="hidden" name="application_id" value="<?= (int)$application['application_id'] ?>">
                         <input type="hidden" name="decision" value="reject">

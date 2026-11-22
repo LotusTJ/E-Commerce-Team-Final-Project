@@ -14,7 +14,7 @@ $headerMode = 'plain';
 $login = [
     'title' => 'Administration',
     'subtitle' => 'Authorised staff only.',
-    'action' => 'actions/auth/admin_login.php',
+    'action' => 'actions/admin_login_action.php',
     'button' => 'Sign in',
     'footer' => '',
 ];

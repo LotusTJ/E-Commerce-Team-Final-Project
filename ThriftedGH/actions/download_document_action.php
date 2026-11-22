@@ -1,6 +1,6 @@
 <?php
-require_once __DIR__ . '/../../core/guard.php';
-require_once __DIR__ . '/../../controllers/Document.php';
+require_once __DIR__ . '/../core/guard.php';
+require_once __DIR__ . '/../controllers/Document.php';
 
 $user = guardRequireLogin();
 

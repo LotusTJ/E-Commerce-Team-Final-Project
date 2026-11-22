@@ -44,7 +44,7 @@ if (!function_exists('renderProductCard')) {
 
                     <div class="product-actions">
                         <?php if ($loggedIn && $canBuy): ?>
-                            <form method="post" action="<?php echo tgh_e(tgh_url('actions/cart/add.php')); ?>">
+                            <form method="post" action="<?php echo tgh_e(tgh_url('actions/add_to_cart_action.php')); ?>">
                                 <?php echo tgh_csrf_field(); ?>
                                 <input type="hidden" name="product_id" value="<?php echo (int)$product['product_id']; ?>">
                                 <button class="btn btn-sm btn-primary" type="submit">Add to cart</button>

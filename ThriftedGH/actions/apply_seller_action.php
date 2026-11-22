@@ -1,6 +1,6 @@
 <?php
-require_once __DIR__ . '/../../core/guard.php';
-require_once __DIR__ . '/../../controllers/Seller.php';
+require_once __DIR__ . '/../core/guard.php';
+require_once __DIR__ . '/../controllers/Seller.php';
 
 $form = tgh_url('views/seller/apply.php');
 

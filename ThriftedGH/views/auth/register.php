@@ -22,7 +22,7 @@ require __DIR__ . '/../layout/header.php';
 
             <?php tgh_render_flash(); ?>
 
-            <form action="<?php echo tgh_e(tgh_url('actions/auth/register.php')); ?>" method="POST" class="auth-form" id="registerForm">
+            <form action="<?php echo tgh_e(tgh_url('actions/register_action.php')); ?>" method="POST" class="auth-form" id="registerForm">
                 <?php echo tgh_csrf_field(); ?>
                 <div class="form-group">
                     <label for="full_name" class="form-label">Full name</label>

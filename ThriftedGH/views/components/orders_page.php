@@ -55,8 +55,8 @@ $titles=['buyer'=>'Your orders','seller'=>'Orders for your shop','admin'=>'Order
 
 <div class="tg-actions tg-noprint">
 <?php if($paid): ?><button type="button" class="btn btn-primary" data-print>Print or save as PDF</button><?php endif; ?>
-<?php if($scope==='buyer' && $detail['payment_status']!=='paid'): ?><form method="post" action="<?=tgh_e(tgh_url('actions/orders/verify.php'))?>"><?=tgh_csrf_field()?><input type="hidden" name="reference" value="<?=tgh_e($detail['order_reference'])?>"><button class="btn btn-primary" data-busy="Checking…">Check payment status</button></form><?php endif; ?>
-<?php if($scope==='buyer' && $pending): ?><form method="post" action="<?=tgh_e(tgh_url('actions/orders/cancel.php'))?>"><?=tgh_csrf_field()?><input type="hidden" name="reference" value="<?=tgh_e($detail['order_reference'])?>"><button class="btn btn-outline" data-confirm="Tap again to confirm">Cancel checkout</button></form><?php endif; ?>
+<?php if($scope==='buyer' && $detail['payment_status']!=='paid'): ?><form method="post" action="<?=tgh_e(tgh_url('actions/verify_order_action.php'))?>"><?=tgh_csrf_field()?><input type="hidden" name="reference" value="<?=tgh_e($detail['order_reference'])?>"><button class="btn btn-primary" data-busy="Checking…">Check payment status</button></form><?php endif; ?>
+<?php if($scope==='buyer' && $pending): ?><form method="post" action="<?=tgh_e(tgh_url('actions/cancel_order_action.php'))?>"><?=tgh_csrf_field()?><input type="hidden" name="reference" value="<?=tgh_e($detail['order_reference'])?>"><button class="btn btn-outline" data-confirm="Tap again to confirm">Cancel checkout</button></form><?php endif; ?>
 <?php if($failed): ?><a class="btn btn-outline" href="<?=tgh_e($basePath)?>views/public/shop.php">Back to the shop</a><?php endif; ?>
 </div>
 
@@ -72,7 +72,7 @@ $titles=['buyer'=>'Your orders','seller'=>'Orders for your shop','admin'=>'Order
 <?php tg_timeline(['Paid','Preparing','Shipped','Delivered'],1+$rank); ?>
 <dl class="tg-rows"><div><dt>Sale price</dt><dd><?=tgh_e(tgh_format_price($item['price_at_purchase']))?></dd></div><div><dt>Marketplace commission</dt><dd>− <?=tgh_e(tgh_format_price($item['commission_amount']))?></dd></div></dl>
 <div class="tg-total"><span>You earn</span><strong><?=tgh_e(tgh_format_price(CommerceModel::money($sellerNet)))?></strong></div>
-<?php if($scope==='seller' && $next): ?><form method="post" action="<?=tgh_e(tgh_url('actions/orders/fulfil.php'))?>" class="tg-actions"><?=tgh_csrf_field()?><input type="hidden" name="item_id" value="<?=(int)$item['order_item_id']?>"><button class="btn btn-primary" name="status" value="<?=tgh_e($next)?>" data-busy="Updating…">Mark as <?=tgh_e(['processing'=>'being prepared','shipped'=>'shipped','delivered'=>'delivered'][$next])?></button></form><?php endif; ?>
+<?php if($scope==='seller' && $next): ?><form method="post" action="<?=tgh_e(tgh_url('actions/fulfil_order_action.php'))?>" class="tg-actions"><?=tgh_csrf_field()?><input type="hidden" name="item_id" value="<?=(int)$item['order_item_id']?>"><button class="btn btn-primary" name="status" value="<?=tgh_e($next)?>" data-busy="Updating…">Mark as <?=tgh_e(['processing'=>'being prepared','shipped'=>'shipped','delivered'=>'delivered'][$next])?></button></form><?php endif; ?>
 </div>
 <?php endforeach; ?>
 <?php endif; ?>
