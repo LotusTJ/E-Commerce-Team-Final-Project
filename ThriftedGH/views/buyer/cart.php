@@ -9,7 +9,6 @@ require __DIR__.'/../layout/header.php';
 $sellerCount=count(array_unique(array_column($items,'seller_id')));
 ?>
 <section class="section tg-page"><div class="container tg-wrap">
-<?php $stepCurrent=1; require __DIR__.'/../components/checkout_steps.php'; ?>
 <h1 class="tg-title">Your cart</h1>
 <?php tgh_render_flash(); if(!$navLoggedIn): ?>
 <div class="tg-card tg-empty"><div class="tg-empty-icon"><?=tgh_icon('lock')?></div><h2>Log in to see your cart</h2><p>Your cart stays linked to your account, so you can pick up where you left off.</p><a class="btn btn-primary" href="<?=tgh_e($basePath)?>views/auth/login.php">Log in</a></div>

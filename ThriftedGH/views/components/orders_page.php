@@ -15,7 +15,6 @@ $ordersUrl=$scopeUrls[$scope];
 $titles=['buyer'=>'Your orders','seller'=>'Sales from your shop','admin'=>'Order administration'];
 ?>
 <section class="section tg-page"><div class="container tg-wrap">
-<?php if($detail && $scope==='buyer'): $stepCurrent=$detail['payment_status']==='paid'?4:3; require __DIR__.'/checkout_steps.php'; endif; ?>
 <h1 class="tg-title"><?=tgh_e($detail?($scope==='seller'?'Sale details':'Receipt'):$titles[$scope])?></h1>
 <?php if($user['role']!=='admin'): ?><nav class="tg-tabs tg-noprint" aria-label="Order views"><a href="<?=tgh_e($scopeUrls['buyer'])?>" class="<?=$scope==='buyer'?'is-active':''?>">My purchases</a><?php if($user['role']==='seller'): ?><a href="<?=tgh_e($scopeUrls['seller'])?>" class="<?=$scope==='seller'?'is-active':''?>">My sales</a><?php endif; ?></nav><?php endif; ?>
 <?php tgh_render_flash(); if($loadError): ?>

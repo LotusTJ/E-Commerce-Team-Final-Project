@@ -19,7 +19,6 @@ $map=[
 $pageTitle='Payment result | ThriftedGH';$activeNav='orders';require __DIR__.'/../layout/header.php';
 ?>
 <section class="section tg-page"><div class="container tg-wrap">
-<?php $stepCurrent=$state==='paid'?4:3; require __DIR__.'/../components/checkout_steps.php'; ?>
 <?php tgh_render_flash(); ?>
 <div class="tg-hero"><div class="tg-hero-icon is-<?=$state?>" aria-hidden="true"><?=tgh_icon($icon)?></div><h1><?=tgh_e($heading)?></h1><p><?=tgh_e($text)?></p></div>
 <div class="tg-card tg-result-card">

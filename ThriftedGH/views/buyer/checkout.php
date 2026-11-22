@@ -7,7 +7,6 @@ try { $model=new OrderClass();$model->expire(); $items=(new CartClass())->items(
 } catch(Throwable $e) {commerce_error($e);}
 $pageTitle='Checkout | ThriftedGH';$activeNav='cart';require __DIR__.'/../layout/header.php'; ?>
 <section class="section tg-page"><div class="container tg-wrap">
-<?php $stepCurrent=2; require __DIR__.'/../components/checkout_steps.php'; ?>
 <h1 class="tg-title">Checkout</h1><?php tgh_render_flash(); ?>
 <?php if(!$ready): ?>
 <div class="tg-card tg-empty"><div class="tg-empty-icon"><?=tgh_icon('basket')?></div><h2>Nothing to check out yet</h2><p>Your cart is empty or has a piece that is no longer available.</p><a class="btn btn-primary" href="<?=tgh_e($basePath)?>views/buyer/cart.php">Back to cart</a></div>
