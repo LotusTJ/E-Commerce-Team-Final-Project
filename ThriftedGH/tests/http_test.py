@@ -14,9 +14,9 @@ def login(email):
  c=client();status,page=get(c,'views/auth/'+portal+'login.php');csrf=re.search(r'name="csrf_token" value="([a-f0-9]+)"',page).group(1)
  status,body=get(c,'actions/auth/'+portal+'login.php',{'email':email,'password':'Member4-test-fixture','csrf_token':csrf})
  status,body=get(c,'views/public/home.php')
- check(status==200 and 'Logout' in body,'login '+email)
+ check(status==200 and 'Sign out' in body,'login '+email)
  return c
-anon=client();status,body=get(anon,'views/buyer/cart.php');check(status==200 and 'Log in' in body,'anonymous cart prompts login')
+anon=client();status,body=get(anon,'views/buyer/cart.php');check(status==200 and 'Sign in' in body,'anonymous cart prompts login')
 check(get(anon,'actions/cart/add.php')[0]==405,'cart mutations reject GET')
 check(get(anon,'payments/webhook.php')[0]==405,'webhook rejects GET')
 check(get(anon,'payments/webhook.php',{'event':'charge.success'})[0]==401,'unsigned webhook rejected')

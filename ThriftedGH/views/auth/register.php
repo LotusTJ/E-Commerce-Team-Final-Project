@@ -57,7 +57,7 @@ require __DIR__ . '/../layout/header.php';
             <div class="auth-footer-links">
                 <p class="auth-switch-text">
                     Already have an account?
-                    <a href="<?php echo tgh_e(tgh_url('views/auth/login.php')); ?>" class="auth-highlight-link">Log in</a>
+                    <a href="<?php echo tgh_e(tgh_url('views/auth/login.php')); ?>" class="auth-highlight-link">Sign in</a>
                 </p>
                 <div class="seller-prompt-box">
                     <span class="prompt-icon"><?php echo tgh_icon('store'); ?></span>

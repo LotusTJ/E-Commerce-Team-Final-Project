@@ -40,9 +40,9 @@ function login_attempt_ctr($portal, $email, $password)
             return ['ok' => false, 'error' => $mismatch];
         }
         if ($portal === 'buyer') {
-            return ['ok' => false, 'error' => 'This is a seller account. Use the seller login instead.'];
+            return ['ok' => false, 'error' => 'This is a seller account. Sign in on the seller page instead.'];
         }
-        return ['ok' => false, 'error' => 'This account is not an approved seller yet. Use the buyer login, or apply to sell from your account page.'];
+        return ['ok' => false, 'error' => 'This account is not an approved seller yet. Sign in as a buyer, then apply to sell from your account page.'];
     }
 
     $users->clearFailures($email);

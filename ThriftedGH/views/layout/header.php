@@ -79,11 +79,11 @@ if (!function_exists('tgh_nav_link')) {
             <nav class="main-nav" id="mainNav">
                 <ul class="nav-list">
                     <?php
-                    $logout = '<li class="nav-item"><a class="nav-link nav-register-btn" href="' . htmlspecialchars(tgh_url('actions/auth/logout.php'), ENT_QUOTES, 'UTF-8') . '">Logout</a></li>';
+                    $logout = '<li class="nav-item"><a class="nav-link nav-register-btn" href="' . htmlspecialchars(tgh_url('actions/auth/logout.php'), ENT_QUOTES, 'UTF-8') . '">Sign out</a></li>';
                     if ($navMode === 'seller') {
                         echo tgh_nav_link('views/seller/dashboard.php', 'Dashboard', 'seller', $activeNav);
-                        echo tgh_nav_link('views/seller/product_form.php', 'Add a piece', 'seller_add', $activeNav);
-                        echo tgh_nav_link('views/seller/orders.php', 'Sales', 'seller_orders', $activeNav);
+                        echo tgh_nav_link('views/seller/product_form.php', 'List an item', 'seller_add', $activeNav);
+                        echo tgh_nav_link('views/seller/orders.php', 'Orders', 'seller_orders', $activeNav);
                         echo $logout;
                     } elseif ($navMode === 'admin') {
                         echo tgh_nav_link('views/admin/dashboard.php', 'Dashboard', 'admin', $activeNav);
@@ -100,8 +100,8 @@ if (!function_exists('tgh_nav_link')) {
                             echo tgh_nav_link('views/buyer/orders.php', 'Orders', 'orders', $activeNav);
                             echo $logout;
                         } else {
-                            echo tgh_nav_link('views/auth/login.php', 'Login', 'login', $activeNav);
-                            echo tgh_nav_link('views/auth/register.php', 'Register', 'register', $activeNav, 'nav-register-btn');
+                            echo tgh_nav_link('views/auth/login.php', 'Sign in', 'login', $activeNav);
+                            echo tgh_nav_link('views/auth/register.php', 'Join', 'register', $activeNav, 'nav-register-btn');
                         }
                         echo tgh_nav_link('views/buyer/cart.php', tgh_icon('cart', 'cart-icon') . ' Cart', 'cart', $activeNav, 'nav-cart-link');
                     }

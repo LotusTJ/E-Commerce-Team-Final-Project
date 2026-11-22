@@ -11,7 +11,7 @@ $sellerCount=count(array_unique(array_column($items,'seller_id')));
 <section class="section tg-page"><div class="container tg-wrap">
 <h1 class="tg-title">Your cart</h1>
 <?php tgh_render_flash(); if(!$navLoggedIn): ?>
-<div class="tg-card tg-empty"><div class="tg-empty-icon"><?=tgh_icon('lock')?></div><h2>Log in to see your cart</h2><p>Your cart stays linked to your account, so you can pick up where you left off.</p><a class="btn btn-primary" href="<?=tgh_e($basePath)?>views/auth/login.php">Log in</a></div>
+<div class="tg-card tg-empty"><div class="tg-empty-icon"><?=tgh_icon('lock')?></div><h2>Sign in to see your cart</h2><p>Your cart stays linked to your account, so you can pick up where you left off.</p><a class="btn btn-primary" href="<?=tgh_e($basePath)?>views/auth/login.php">Sign in</a></div>
 <?php elseif($loadError): ?><div class="tg-note tg-note-warn" role="alert">Your cart is temporarily unavailable. Please reload this page.</div>
 <?php elseif(!$items): ?>
 <div class="tg-card tg-empty"><div class="tg-empty-icon"><?=tgh_icon('bag')?></div><h2>Your cart is empty</h2><p>Every piece here is one of one, so good finds go fast. Have a look around.</p><a class="btn btn-primary" href="<?=tgh_e($basePath)?>views/public/shop.php">Browse the shop</a></div>

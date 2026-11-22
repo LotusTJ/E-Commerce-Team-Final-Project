@@ -21,7 +21,7 @@ function guardDeny($code, $message)
     $denyUser = authCurrentUser();
     $denyRole = $denyUser ? $denyUser['role'] : 'buyer';
     require __DIR__ . '/../views/layout/header.php';
-    echo '<section class="section"><div class="container"><div class="empty-state-card"><h1>' . ($code === 401 ? 'Please log in' : 'Access denied') . '</h1><p>' . htmlspecialchars($message, ENT_QUOTES, 'UTF-8') . '</p><a class="btn btn-primary" href="' . htmlspecialchars(tgh_role_home($denyRole), ENT_QUOTES, 'UTF-8') . '">' . ($denyRole === 'buyer' ? 'Back to home' : 'Back to dashboard') . '</a></div></div></section>';
+    echo '<section class="section"><div class="container"><div class="empty-state-card"><h1>' . ($code === 401 ? 'Please sign in' : 'Access denied') . '</h1><p>' . htmlspecialchars($message, ENT_QUOTES, 'UTF-8') . '</p><a class="btn btn-primary" href="' . htmlspecialchars(tgh_role_home($denyRole), ENT_QUOTES, 'UTF-8') . '">' . ($denyRole === 'buyer' ? 'Back to home' : 'Back to dashboard') . '</a></div></div></section>';
     require __DIR__ . '/../views/layout/footer.php';
     exit;
 }
@@ -34,7 +34,7 @@ function guardRequireLogin($portal = 'buyer')
             session_unset();
         }
         if (!guardIsPageRequest()) {
-            guardDeny(401, 'Please log in first.');
+            guardDeny(401, 'Please sign in first.');
         }
         header('Location: ' . tgh_login_url($portal));
         exit;

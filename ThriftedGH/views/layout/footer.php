@@ -38,10 +38,10 @@ $footerMode = isset($headerMode) ? $headerMode : (($footerUser && in_array($foot
             <div class="footer-col footer-links-col">
                 <h4 class="footer-heading">Accounts</h4>
                 <ul class="footer-links">
-                    <li><a href="<?php echo $basePath; ?>views/auth/login.php">Buyer log in</a></li>
-                    <li><a href="<?php echo $basePath; ?>views/auth/seller_login.php">Seller log in</a></li>
+                    <li><a href="<?php echo $basePath; ?>views/auth/login.php">Sign in</a></li>
+                    <li><a href="<?php echo $basePath; ?>views/auth/seller_login.php">Seller sign in</a></li>
                     <li><a href="<?php echo $basePath; ?>views/auth/register.php">Create an account</a></li>
-                    <li><a href="<?php echo $basePath; ?>views/seller/apply.php">Become a seller</a></li>
+                    <li><a href="<?php echo $basePath; ?>views/seller/apply.php">Start selling</a></li>
                 </ul>
             </div>
         </div>
@@ -49,7 +49,7 @@ $footerMode = isset($headerMode) ? $headerMode : (($footerUser && in_array($foot
 
         <div class="footer-bottom">
             <div class="container footer-bottom-content">
-                <p class="copyright-text">&copy; 2026 ThriftedGH. Ashesi University E-Commerce group project.</p>
+                <p class="copyright-text">&copy; 2026 ThriftedGH. Ashesi University E-Commerce group project. Homepage photography from Unsplash contributors.</p>
             </div>
         </div>
     </footer>

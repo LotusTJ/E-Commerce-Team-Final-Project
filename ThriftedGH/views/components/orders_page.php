@@ -12,7 +12,7 @@ try {
 $pageTitle='Orders | ThriftedGH';$activeNav=$scope==='buyer'?'orders':$scope.'_orders';require __DIR__.'/../layout/header.php';
 $scopeUrls=['buyer'=>tgh_url('views/buyer/orders.php'),'seller'=>tgh_url('views/seller/orders.php'),'admin'=>tgh_url('views/admin/orders.php')];
 $ordersUrl=$scopeUrls[$scope];
-$titles=['buyer'=>'Your orders','seller'=>'Sales from your shop','admin'=>'Order administration'];
+$titles=['buyer'=>'Your orders','seller'=>'Orders for your shop','admin'=>'Order administration'];
 ?>
 <section class="section tg-page"><div class="container tg-wrap">
 <h1 class="tg-title"><?=tgh_e($detail?($scope==='seller'?'Sale details':'Receipt'):$titles[$scope])?></h1>

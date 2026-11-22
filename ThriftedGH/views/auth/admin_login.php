@@ -15,7 +15,7 @@ $login = [
     'title' => 'Administration',
     'subtitle' => 'Authorised staff only.',
     'action' => 'actions/auth/admin_login.php',
-    'button' => 'Log in',
+    'button' => 'Sign in',
     'footer' => '',
 ];
 

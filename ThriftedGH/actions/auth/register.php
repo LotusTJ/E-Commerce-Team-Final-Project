@@ -41,7 +41,7 @@ if ($errors) {
 }
 
 if ($users->registerUser($fullName, $email, password_hash($password, PASSWORD_DEFAULT), $phone)) {
-    tgh_flash_set('success', 'Your account is ready. Log in to continue.');
+    tgh_flash_set('success', 'Your account is ready. Sign in to continue.');
     tgh_redirect(tgh_url('views/auth/login.php'));
 }
 

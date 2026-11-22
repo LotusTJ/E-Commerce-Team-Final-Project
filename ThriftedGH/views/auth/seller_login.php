@@ -7,27 +7,27 @@ if ($current) {
     tgh_redirect(tgh_role_home($current['role']));
 }
 
-$pageTitle = 'Seller log in | ThriftedGH';
+$pageTitle = 'Seller sign in | ThriftedGH';
 $activeNav = '';
 $headerMode = 'plain';
 
 ob_start();
 ?>
 <p class="auth-switch-text">
-    Not a seller yet?
+    Not selling yet?
     <a href="<?php echo tgh_e(tgh_url('views/auth/register.php')); ?>" class="auth-highlight-link">Create an account</a>
-    and apply from your account page.
+    then apply to sell from your account page.
 </p>
 <p class="auth-switch-text">
-    Shopping instead?
-    <a href="<?php echo tgh_e(tgh_url('views/auth/login.php')); ?>" class="auth-highlight-link">Buyer log in</a>
+    Here to shop?
+    <a href="<?php echo tgh_e(tgh_url('views/auth/login.php')); ?>" class="auth-highlight-link">Sign in as a buyer</a>
 </p>
 <?php
 $login = [
-    'title' => 'Seller log in',
-    'subtitle' => 'Manage your listings and the orders you need to fulfil.',
+    'title' => 'Seller sign in',
+    'subtitle' => 'Manage your shop and fulfil your orders.',
     'action' => 'actions/auth/seller_login.php',
-    'button' => 'Log in to seller portal',
+    'button' => 'Sign in to my shop',
     'footer' => ob_get_clean(),
 ];
 

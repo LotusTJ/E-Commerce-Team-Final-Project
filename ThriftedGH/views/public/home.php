@@ -3,131 +3,161 @@ require_once __DIR__ . '/../../controllers/Cart.php';
 require_once __DIR__ . '/../../classes/CatalogueRepository.php';
 require_once __DIR__ . '/../components/product_card.php';
 
-$featured = [];
+$products = [];
 try {
-    $featured = array_slice((new CatalogueRepository())->browse([], 4), 0, 4);
+    $products = (new CatalogueRepository())->browse([], 60);
 } catch (Throwable $e) {
     error_log('Home catalogue: ' . $e->getMessage());
 }
 
-$pageTitle = 'ThriftedGH | Second-hand clothing in Ghana';
+$newIn = array_slice($products, 0, 8);
+
+$tiles = [];
+foreach ($products as $item) {
+    $key = (int)($item['category_id'] ?? 0);
+    if ($key < 1) {
+        continue;
+    }
+    if (!isset($tiles[$key])) {
+        $tiles[$key] = ['name' => $item['category_name'], 'image' => $item['image_path'], 'from' => (float)$item['price'], 'count' => 0];
+    }
+    $tiles[$key]['count']++;
+    if ((float)$item['price'] < $tiles[$key]['from']) {
+        $tiles[$key]['from'] = (float)$item['price'];
+    }
+}
+uasort($tiles, function ($a, $b) {
+    return $b['count'] <=> $a['count'];
+});
+$tiles = array_slice($tiles, 0, 4, true);
+
+$topsId = 0;
+foreach ($products as $item) {
+    if (strcasecmp((string)$item['category_name'], 'Tops') === 0) {
+        $topsId = (int)$item['category_id'];
+        break;
+    }
+}
+$shopUrl = tgh_url('views/public/shop.php');
+$looks = [
+    ['file' => 'look-1.jpg', 'label' => 'Sweatshirts', 'href' => $topsId ? $shopUrl . '?category=' . $topsId : $shopUrl],
+    ['file' => 'look-2.jpg', 'label' => 'Graphic tees', 'href' => $topsId ? $shopUrl . '?category=' . $topsId : $shopUrl],
+    ['file' => 'look-3.jpg', 'label' => 'Outerwear', 'href' => $shopUrl],
+];
+$looks = array_values(array_filter($looks, function ($look) {
+    return is_file(__DIR__ . '/../../images/home/' . $look['file']);
+}));
+$sellPhoto = is_file(__DIR__ . '/../../images/home/sell.jpg') ? 'images/home/sell.jpg' : null;
+
+$heroPhoto = is_file(__DIR__ . '/../../images/home/hero.jpg') ? 'images/home/hero.jpg' : null;
+$heroImages = [];
+foreach (array_slice($products, 0, 3) as $item) {
+    $heroImages[] = ['src' => tgh_catalogue_image($item['image_path']), 'alt' => $item['title']];
+}
+
+$pageTitle = 'ThriftedGH | Second-hand fashion from Ghana';
 $activeNav = 'home';
 require __DIR__ . '/../layout/header.php';
 ?>
-<section class="hero-section">
-    <div class="container hero-container">
-        <div class="hero-content">
-            <div class="hero-badge"><span class="badge-dot"></span> Second-hand clothing in Ghana</div>
-            <h1 class="hero-title">Buy and sell <span class="highlight-text">thrifted clothes</span> without the market crowd</h1>
-            <p class="hero-subtitle">
-                Student sellers and local thrift shops list their pieces here. Each item is one of one, with its size, condition and measurements shown before you pay.
-            </p>
-
-            <div class="hero-cta-group">
-                <a href="<?php echo $basePath; ?>views/public/shop.php" class="btn btn-lg btn-primary">Shop now <?php echo tgh_icon('arrow-right'); ?></a>
-                <a href="<?php echo $basePath; ?>views/seller/apply.php" class="btn btn-lg btn-secondary">Become a seller</a>
-            </div>
-
-            <div class="hero-features-row">
-                <div class="feature-item">
-                    <span class="feature-icon"><?php echo tgh_icon('tag'); ?></span>
-                    <span class="feature-label">Every piece is one of one</span>
-                </div>
-                <div class="feature-item">
-                    <span class="feature-icon"><?php echo tgh_icon('shield'); ?></span>
-                    <span class="feature-label">Sellers are approved by an admin</span>
-                </div>
-                <div class="feature-item">
-                    <span class="feature-icon"><?php echo tgh_icon('repeat'); ?></span>
-                    <span class="feature-label">Prices in Ghana cedis (GH₵)</span>
-                </div>
+<section class="home-hero">
+    <div class="container home-hero-grid">
+        <div class="home-hero-copy">
+            <p class="home-eyebrow">New pieces added daily</p>
+            <h1 class="home-hero-title">Thrifted.<br>One of one.</h1>
+            <p class="home-hero-sub">Second-hand fashion from Ghana's student sellers and thrift shops.</p>
+            <div class="home-hero-actions">
+                <a href="<?php echo $basePath; ?>views/public/shop.php" class="btn btn-lg btn-accent">Shop new in</a>
+                <a href="<?php echo $basePath; ?>views/seller/apply.php" class="btn btn-lg btn-outline-light">Start selling</a>
             </div>
         </div>
-
-        <div class="hero-image-wrap">
-            <div class="hero-card-stack">
-                <div class="hero-preview-card">
-                    <img src="<?php echo $basePath; ?>images/products/denim-jacket.svg" alt="Denim jacket" class="hero-img">
-                </div>
-            </div>
+        <div class="home-hero-media">
+            <?php if ($heroPhoto): ?>
+                <img class="home-hero-photo" src="<?php echo tgh_e($basePath . $heroPhoto); ?>" alt="Featured look">
+            <?php else: ?>
+                <?php foreach ($heroImages as $i => $img): ?>
+                    <img class="home-hero-tile tile-<?php echo (int)$i; ?>" src="<?php echo tgh_e($basePath . $img['src']); ?>" alt="<?php echo tgh_e($img['alt']); ?>">
+                <?php endforeach; ?>
+            <?php endif; ?>
         </div>
     </div>
 </section>
 
-<section class="section how-it-works-section">
+<?php if ($looks): ?>
+<section class="home-section">
     <div class="container">
-        <div class="section-header text-center">
-            <h2 class="section-title">How it works</h2>
-            <p class="section-description">Four steps from browsing to your door.</p>
+        <div class="home-head">
+            <h2 class="home-h2">Shop the look</h2>
+            <a class="home-link" href="<?php echo tgh_e($shopUrl); ?>">View all <?php echo tgh_icon('arrow-right'); ?></a>
         </div>
-
-        <div class="steps-grid">
-            <div class="step-card">
-                <div class="step-number">01</div>
-                <div class="step-icon"><?php echo tgh_icon('search'); ?></div>
-                <h3 class="step-title">Browse</h3>
-                <p class="step-text">Filter by category, size, condition and price to find what fits your style and budget.</p>
-            </div>
-            <div class="step-card">
-                <div class="step-number">02</div>
-                <div class="step-icon"><?php echo tgh_icon('ruler'); ?></div>
-                <h3 class="step-title">Check the fit</h3>
-                <p class="step-text">Save your measurements once and Find My Fit shows which listings are likely to suit you.</p>
-            </div>
-            <div class="step-card">
-                <div class="step-number">03</div>
-                <div class="step-icon"><?php echo tgh_icon('bag'); ?></div>
-                <h3 class="step-title">Pay with Paystack</h3>
-                <p class="step-text">Add pieces to your cart and pay by card or mobile money. Your pieces are held for 15 minutes while you pay.</p>
-            </div>
-            <div class="step-card">
-                <div class="step-number">04</div>
-                <div class="step-icon"><?php echo tgh_icon('truck'); ?></div>
-                <h3 class="step-title">Get it delivered</h3>
-                <p class="step-text">The seller prepares and ships your order, and you can follow each stage from your orders page.</p>
-            </div>
+        <div class="look-grid">
+            <?php foreach ($looks as $look): ?>
+                <a class="cat-tile look-tile" href="<?php echo tgh_e($look['href']); ?>">
+                    <img src="<?php echo tgh_e($basePath . 'images/home/' . $look['file']); ?>" alt="<?php echo tgh_e($look['label']); ?>" loading="lazy">
+                    <span class="cat-bar">
+                        <span class="cat-name"><?php echo tgh_e($look['label']); ?></span>
+                        <span class="cat-from">Shop now</span>
+                    </span>
+                </a>
+            <?php endforeach; ?>
         </div>
     </div>
 </section>
+<?php endif; ?>
 
-<section class="section featured-products-section">
+<?php if ($tiles): ?>
+<section class="home-section">
     <div class="container">
-        <div class="section-header-flex">
-            <div>
-                <h2 class="section-title">Latest listings</h2>
-                <p class="section-description">Once a piece is sold it disappears from the shop.</p>
-            </div>
-            <a href="<?php echo $basePath; ?>views/public/shop.php" class="btn btn-outline view-all-btn">View the full shop <?php echo tgh_icon('arrow-right'); ?></a>
+        <div class="home-head">
+            <h2 class="home-h2">Shop by category</h2>
         </div>
+        <div class="cat-grid">
+            <?php foreach ($tiles as $id => $tile): ?>
+                <a class="cat-tile" href="<?php echo tgh_e(tgh_url('views/public/shop.php')); ?>?category=<?php echo (int)$id; ?>">
+                    <img src="<?php echo tgh_e($basePath . tgh_catalogue_image($tile['image'])); ?>" alt="" loading="lazy">
+                    <span class="cat-bar">
+                        <span class="cat-name"><?php echo tgh_e($tile['name']); ?></span>
+                        <span class="cat-from">From GH₵ <?php echo number_format($tile['from'], 0); ?></span>
+                    </span>
+                </a>
+            <?php endforeach; ?>
+        </div>
+    </div>
+</section>
+<?php endif; ?>
 
+<section class="home-section">
+    <div class="container">
+        <div class="home-head">
+            <h2 class="home-h2">New in</h2>
+            <a class="home-link" href="<?php echo $basePath; ?>views/public/shop.php">View all <?php echo tgh_icon('arrow-right'); ?></a>
+        </div>
         <div class="product-grid">
-            <?php if (!$featured): ?>
+            <?php if (!$newIn): ?>
                 <p>No pieces are listed right now. Check back soon.</p>
             <?php endif; ?>
-            <?php foreach ($featured as $item) { renderProductCard($item, $basePath); } ?>
+            <?php foreach ($newIn as $item) { renderProductCard($item, $basePath); } ?>
         </div>
     </div>
 </section>
 
-<section class="section seller-cta-section">
-    <div class="container">
-        <div class="seller-cta-card">
-            <div class="seller-cta-content">
-                <h2 class="seller-cta-title">Have clothes to sell?</h2>
-                <p class="seller-cta-desc">
-                    Whether you are a student clearing your wardrobe or you run a thrift shop, you can apply for a seller account. An administrator reviews your application and documents before you can list anything.
-                </p>
-                <ul class="seller-perks-list">
-                    <li><?php echo tgh_icon('check'); ?> Individual and business storefronts</li>
-                    <li><?php echo tgh_icon('check'); ?> Upload your verification documents online</li>
-                    <li><?php echo tgh_icon('check'); ?> ThriftedGH keeps a 10% commission, you keep 90%</li>
-                </ul>
-                <div class="seller-cta-buttons">
-                    <a href="<?php echo $basePath; ?>views/public/sellers.php" class="btn btn-lg btn-accent">See our sellers</a>
-                    <a href="<?php echo $basePath; ?>views/auth/register.php" class="btn btn-lg btn-outline-light">Create an account</a>
-                </div>
-            </div>
+<section class="home-strip">
+    <div class="container home-strip-grid">
+        <div class="strip-item"><?php echo tgh_icon('tag'); ?><span>Every piece is one of one</span></div>
+        <div class="strip-item"><?php echo tgh_icon('shield'); ?><span>Sellers checked by our team</span></div>
+        <div class="strip-item"><?php echo tgh_icon('receipt'); ?><span>Pay by card or mobile money</span></div>
+    </div>
+</section>
+
+<section class="home-sell">
+    <div class="home-sell-grid<?php echo $sellPhoto ? ' has-photo' : ''; ?>">
+        <div class="home-sell-copy">
+            <h2 class="home-sell-title">Got clothes to sell?</h2>
+            <p class="home-sell-sub">Open your shop and keep 90% of every sale.</p>
+            <a href="<?php echo $basePath; ?>views/seller/apply.php" class="btn btn-lg btn-light">Start selling</a>
         </div>
+        <?php if ($sellPhoto): ?>
+            <img class="home-sell-photo" src="<?php echo tgh_e($basePath . $sellPhoto); ?>" alt="" loading="lazy">
+        <?php endif; ?>
     </div>
 </section>
 <?php require __DIR__ . '/../layout/footer.php'; ?>

@@ -19,7 +19,7 @@ class CatalogueRepository {
     public function categories() { return $this->rows('SELECT category_id, category_name FROM categories ORDER BY category_name'); }
     public function sizes() { return $this->rows('SELECT DISTINCT p.size AS value'.$this->base()." AND p.size IS NOT NULL AND p.size<>'' ORDER BY p.size"); }
     public function browse(array $f = [], $limit = 100) {
-        $sql='SELECT p.product_id,p.title,p.description,p.price,p.size,p.item_condition,p.image_path,p.seller_id,c.category_name,sp.shop_name AS seller_name'.$this->base();
+        $sql='SELECT p.product_id,p.title,p.description,p.price,p.size,p.item_condition,p.image_path,p.seller_id,p.category_id,c.category_name,sp.shop_name AS seller_name'.$this->base();
         $types=''; $values=[];
         if (!empty($f['q'])) { $sql.=' AND p.title LIKE ?'; $types.='s'; $values[]='%'.$f['q'].'%'; }
         if (!empty($f['category']) && ctype_digit((string)$f['category'])) { $sql.=' AND p.category_id=?'; $types.='i'; $values[]=(int)$f['category']; }

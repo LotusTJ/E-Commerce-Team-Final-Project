@@ -53,11 +53,11 @@ $values = [
     'inseam' => tgh_field_value('inseam', $old, $product, 'inseam_cm')
 ];
 
-tgh_layout_start($editing ? 'Edit product' : 'Add a product', 'seller_add');
+tgh_layout_start($editing ? 'Edit product' : 'List an item', 'seller_add');
 tgh_render_flash();
 ?>
 <section class="m3-head">
-    <h1><?= $editing ? 'Edit product' : 'Add a product' ?></h1>
+    <h1><?= $editing ? 'Edit product' : 'List an item' ?></h1>
     <p class="m3-muted">Every listing is a one-of-one piece. Once it sells it leaves the shop automatically.</p>
 </section>
 

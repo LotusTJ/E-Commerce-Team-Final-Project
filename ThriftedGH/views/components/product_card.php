@@ -43,7 +43,6 @@ if (!function_exists('renderProductCard')) {
                     </div>
 
                     <div class="product-actions">
-                        <a href="<?php echo tgh_e($productUrl); ?>" class="btn btn-sm btn-outline">Details</a>
                         <?php if ($loggedIn && $canBuy): ?>
                             <form method="post" action="<?php echo tgh_e(tgh_url('actions/cart/add.php')); ?>">
                                 <?php echo tgh_csrf_field(); ?>
@@ -51,7 +50,9 @@ if (!function_exists('renderProductCard')) {
                                 <button class="btn btn-sm btn-primary" type="submit">Add to cart</button>
                             </form>
                         <?php elseif (!$loggedIn): ?>
-                            <a class="btn btn-sm btn-primary" href="<?php echo tgh_e(tgh_url('views/auth/login.php')); ?>">Log in to buy</a>
+                            <a class="btn btn-sm btn-primary" href="<?php echo tgh_e(tgh_url('views/auth/login.php')); ?>">Sign in to buy</a>
+                        <?php else: ?>
+                            <a class="btn btn-sm btn-outline" href="<?php echo tgh_e($productUrl); ?>">View piece</a>
                         <?php endif; ?>
                     </div>
                 </div>

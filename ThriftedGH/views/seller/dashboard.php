@@ -29,8 +29,8 @@ tgh_render_flash();
     </div>
 
     <div class="m3-actions-row">
-        <a class="m3-btn" href="<?= tgh_e(tgh_url('views/seller/product_form.php')) ?>">Add a product</a>
-        <a class="m3-btn m3-btn-ghost" href="<?= tgh_e(tgh_url('views/seller/orders.php')) ?>">My sales</a>
+        <a class="m3-btn" href="<?= tgh_e(tgh_url('views/seller/product_form.php')) ?>">List an item</a>
+        <a class="m3-btn m3-btn-ghost" href="<?= tgh_e(tgh_url('views/seller/orders.php')) ?>">My orders</a>
         <a class="m3-btn m3-btn-ghost" href="<?= tgh_e(tgh_url('views/public/storefront.php')) ?>?seller_id=<?= (int)$seller['seller_id'] ?>">View my storefront</a>
     </div>
 

@@ -130,7 +130,7 @@ for who, em, bad_portal in [("seller", "ama@demo.com", "buyer"), ("buyer", "efua
     s_, r, back = attempt(em, bad_portal)
     check(f"{who} credentials refused on the {bad_portal} login", back.endswith(PORTALS[bad_portal][0]) and get(s_, "views/buyer/dashboard.php").status_code == 302, back)
     msg = s_.get(f"{B}/{PORTALS[bad_portal][0]}").text
-    check(f"{who} sent to the right login with a clear message", ("seller login" in msg.lower() or "buyer login" in msg.lower()))
+    check(f"{who} sent to the right login with a clear message", ("seller page" in msg.lower() or "sign in as a buyer" in msg.lower()))
 for em, portal in [("admin@demo.com", "buyer"), ("admin@demo.com", "seller"), ("efua@demo.com", "admin"), ("ama@demo.com", "admin")]:
     s_, r, back = attempt(em, portal)
     page = s_.get(f"{B}/{PORTALS[portal][0]}").text
@@ -149,14 +149,14 @@ for pth in ["views/seller/dashboard.php", "views/public/home.php", "views/public
     html = re.search(r'<nav class="main-nav".*?</nav>', get(sj, pth).text, re.S).group(0)
     check(f"seller navbar on {pth} has no Home, Shop, Find My Fit or Cart", all(x not in html for x in [">Home<", ">Shop<", "Find My Fit", "nav-cart-link", ">Sellers<"]))
 html = get(sj, "views/seller/dashboard.php").text
-check("seller navbar shows Dashboard, Add a piece, Sales and Logout", all(x in html for x in [">Dashboard<", ">Add a piece<", ">Sales<", ">Logout<"]))
+check("seller navbar shows Dashboard, List an item, Orders and Sign out", all(x in html for x in [">Dashboard<", ">List an item<", ">Orders<", ">Sign out<"]))
 check("seller does not see announcement bar or shopper footer", "announcement-bar" not in html and "footer-links-col" not in html)
 pid = re.search(r'product.php\?id=(\d+)', get(sj, "views/public/shop.php").text)
 if pid:
     check("seller sees no Add to cart on a product page", "Add to cart" not in get(sj, f"views/public/product.php?id={pid.group(1)}").text)
 aj, r, back = attempt("admin@demo.com", "admin")
 html = get(aj, "views/admin/dashboard.php").text
-check("admin navbar has no shopper links", all(x not in html for x in [">Home<", ">Shop<", "Find My Fit", "nav-cart-link"]) and all(x in html for x in [">Applications<", ">Orders<", ">Logout<"]))
+check("admin navbar has no shopper links", all(x not in html for x in [">Home<", ">Shop<", "Find My Fit", "nav-cart-link"]) and all(x in html for x in [">Applications<", ">Orders<", ">Sign out<"]))
 r = get(sj, "actions/auth/logout.php"); check("seller logout returns to the seller login", r.headers.get("Location", "").endswith("views/auth/seller_login.php"), r.headers.get("Location"))
 
 print("== login lockout ==")
