@@ -38,8 +38,18 @@ require __DIR__ . '/../layout/header.php';
                 </div>
                 <div class="form-group">
                     <label for="password" class="form-label">Password</label>
-                    <input type="password" id="password" name="password" class="form-control" required minlength="8" autocomplete="new-password">
-                    <p class="form-hint">At least 8 characters.</p>
+                    <div class="password-field">
+                        <input type="password" id="password" name="password" class="form-control" required minlength="8" autocomplete="new-password">
+                        <button type="button" class="password-toggle" data-toggle-password="#password" aria-label="Show password"><?php echo tgh_icon('eye', 'eye-open') . tgh_icon('eye-off', 'eye-closed'); ?></button>
+                    </div>
+                    <p class="form-hint">At least 8 characters, with a letter and a number.</p>
+                </div>
+                <div class="form-group">
+                    <label for="confirm_password" class="form-label">Confirm password</label>
+                    <div class="password-field">
+                        <input type="password" id="confirm_password" name="confirm_password" class="form-control" required minlength="8" autocomplete="new-password">
+                        <button type="button" class="password-toggle" data-toggle-password="#confirm_password" aria-label="Show password"><?php echo tgh_icon('eye', 'eye-open') . tgh_icon('eye-off', 'eye-closed'); ?></button>
+                    </div>
                 </div>
                 <button type="submit" class="btn btn-lg btn-primary btn-block">Create account</button>
             </form>
@@ -60,4 +70,5 @@ require __DIR__ . '/../layout/header.php';
         </div>
     </div>
 </section>
+<script src="<?php echo $basePath; ?>js/auth.js" defer></script>
 <?php require __DIR__ . '/../layout/footer.php'; ?>

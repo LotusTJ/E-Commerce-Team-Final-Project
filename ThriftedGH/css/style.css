@@ -2662,3 +2662,13 @@ textarea.form-control { display: block; width: 100%; max-width: 40rem; margin: .
 .doc-list .tg-icon { width: 1rem; height: 1rem; color: var(--color-text-light, #6b7280); }
 .form-hint { margin: .35rem 0 0; font-size: .8rem; color: var(--color-text-muted, #6b7280); }
 .m3-btn .tg-icon { width: 1em; height: 1em; margin-right: .25rem; }
+
+.password-field { position: relative; display: flex; }
+.password-field .form-control { width: 100%; padding-right: 3rem; }
+.password-toggle { position: absolute; top: 0; right: 0; bottom: 0; width: 2.75rem; display: flex; align-items: center; justify-content: center; background: none; border: 0; color: var(--color-text-muted); cursor: pointer; border-radius: 0 var(--radius-sm) var(--radius-sm) 0; }
+.password-toggle:hover, .password-toggle:focus-visible { color: var(--color-primary); }
+.password-toggle .tg-icon { width: 1.15rem; height: 1.15rem; }
+.form-control.is-invalid { border-color: #b42318; }
+.field-error { margin: .35rem 0 0; font-size: .82rem; color: #b42318; }
+.password-toggle .eye-closed, .password-toggle.is-visible .eye-open { display: none; }
+.password-toggle.is-visible .eye-closed { display: block; }

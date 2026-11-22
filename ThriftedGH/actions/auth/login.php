@@ -15,12 +15,23 @@ if ($email === '' || $password === '') {
     tgh_redirect($loginPage);
 }
 
-$user = (new UserClass())->loginUser($email);
+$users = new UserClass();
+$ip = substr((string)($_SERVER['REMOTE_ADDR'] ?? ''), 0, 45);
+
+if ($users->isLockedOut($email, $ip)) {
+    tgh_flash_set('error', 'Too many failed attempts. Please wait ' . UserClass::LOCK_MINUTES . ' minutes and try again.');
+    tgh_redirect($loginPage);
+}
+
+$user = $users->loginUser($email);
 
 if (!$user || !password_verify($password, $user['password_hash'])) {
+    $users->recordFailure($email, $ip);
     tgh_flash_set('error', 'That email and password do not match an account.');
     tgh_redirect($loginPage);
 }
+
+$users->clearFailures($email);
 
 session_regenerate_id(true);
 $_SESSION['user_id'] = (int)$user['user_id'];

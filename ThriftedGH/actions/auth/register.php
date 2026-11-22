@@ -22,8 +22,11 @@ if (!filter_var($email, FILTER_VALIDATE_EMAIL) || mb_strlen($email) > 150) {
 if ($phone !== '' && !preg_match('/^\+?[0-9][0-9 ()-]{6,18}$/', $phone)) {
     $errors[] = 'Enter a valid phone number or leave it blank.';
 }
-if (strlen($password) < 8) {
-    $errors[] = 'Your password needs at least 8 characters.';
+if (strlen($password) < 8 || !preg_match('/[A-Za-z]/', $password) || !preg_match('/[0-9]/', $password)) {
+    $errors[] = 'Your password needs at least 8 characters, with a letter and a number.';
+}
+if ($password !== tgh_input_string($_POST, 'confirm_password')) {
+    $errors[] = 'The two passwords do not match.';
 }
 
 $users = new UserClass();

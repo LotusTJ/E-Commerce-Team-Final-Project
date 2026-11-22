@@ -115,6 +115,17 @@ r = ap.get(f"{B}/views/seller/dashboard.php", allow_redirects=False); check("app
 r = up(ap, "late.png", png(), "image/png"); page = get(ap, "views/seller/documents.php").text
 check("no uploads after approval", "late.png" not in page)
 
+print("== login lockout ==")
+import subprocess
+subprocess.run(["mysql","-utgh","-ptghpass","thriftedgh","-e","delete from login_attempts"])
+for i in range(5): login("efua@demo.com", "wrong-pass-%d" % i)
+lk, r = login("efua@demo.com", "demo1234")
+check("account locks after 5 failed logins even with the right password", r.headers.get("Location","").endswith("views/auth/login.php") and "Too many failed attempts" in lk.get(f"{B}/views/auth/login.php").text)
+check("locked account cannot reach protected page", get(lk, "views/buyer/dashboard.php").status_code == 302)
+subprocess.run(["mysql","-utgh","-ptghpass","thriftedgh","-e","delete from login_attempts"])
+ok2, r = login("efua@demo.com", "demo1234"); check("login works again after lockout is cleared", get(ok2, "views/buyer/dashboard.php").status_code == 200)
+hdr = requests.get(f"{B}/views/public/home.php").headers
+check("security headers present", hdr.get("X-Content-Type-Options") == "nosniff" and hdr.get("X-Frame-Options") == "SAMEORIGIN" and "Referrer-Policy" in hdr)
 print("== session handling ==")
 r = get(ad, "actions/auth/logout.php"); check("logout redirects", r.status_code == 302)
 r = get(ad, "views/admin/dashboard.php"); check("admin page blocked after logout", r.status_code == 302 and r.headers["Location"].endswith("views/auth/login.php"), r.status_code)
